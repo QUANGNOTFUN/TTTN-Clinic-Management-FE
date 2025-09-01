@@ -76,7 +76,7 @@ const Login = () => {
                                         message: "Vui lòng nhập đúng định dạng email",
                                     },
                                 })}
-                                className={`mt-2 block w-full px-4 py-3 border text-xs sm:text-sm md:text-base ${
+                                className={`mt-2 block w-full px-4 py-3 border text-xs sm:text-sm md:text-base tab ${
                                   errors.email ? "border-red-500" : "border-gray-300"
                                 } rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-300 transition duration-200`}
                                 placeholder={"nhapemail@domain.com"}
@@ -117,10 +117,10 @@ const Login = () => {
                       <div>
                           <button
                             type={"submit"}
-                            className={"w-full py-3 px-6 rounded-lg shadow-md shadow-teal-700/60 cursor-pointer " +
+                            className={"w-full py-3 px-6 rounded-lg shadow-md shadow-teal-700/60 cursor-pointer transition duration-300 " +
                               "text-sm sm:text-lg md:text-xl text-white font-medium " +
-                              "bg-gradient-to-r from-emerald-300/70 to-teal-600 hover:from-teal-600 hover:to-teal-700 " +
-                              "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300"}
+                              "bg-gradient-to-r from-emerald-300/70 to-teal-600 hover:from-teal-600 hover:to-teal-700 "
+                            }
                           >
                               Đăng nhập
                           </button>
@@ -147,16 +147,16 @@ const Login = () => {
                           "text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
                         >
                             <Button
-                              href={"/forgot-password"}
-                              className={"hover:text-blue-800 text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
-                            >
-                                Quên mật khẩu?
-                            </Button>
-                            <Button
                               href={"/register"}
                               className={"hover:text-blue-800 text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
                             >
                                 Đăng kí ngay!
+                            </Button>
+                            <Button
+                              href={"/forgot-password"}
+                              className={"hover:text-blue-800 text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
+                            >
+                                Quên mật khẩu?
                             </Button>
                         </div>
                     </div>

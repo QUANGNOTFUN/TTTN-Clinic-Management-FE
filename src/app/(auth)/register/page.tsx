@@ -2,90 +2,87 @@
 
 import {useForm} from "react-hook-form";
 import {getErrorMessage} from "@/app/utils/common";
+import React from "react";
+import Image from "next/image";
+import {Button} from "@mui/material";
+import {useRegister} from "@/libs/hooks/auth/useRegister";
+import {RegisterForm, RegisterPayload} from "@/models/register";
 import {useRouter} from "next/navigation";
-import {useSnackbar} from "notistack";
-import {useLoading} from "@/app/context/loadingContext";
-import {useMutation} from "@apollo/client";
-import React, {useState} from "react";
-import REGISTER_MUTATION from "@/libs/graphqls/mutations/registerMutations";
-import {EyeIcon, EyeSlashIcon} from "@heroicons/react/24/solid";
-import {UserPlus} from "lucide-react";
+import {toast} from "react-toastify";
+import {VscLoading} from "react-icons/vsc";
 
 const Register = () => {
-    const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
-    const { enqueueSnackbar } = useSnackbar();
-    const { setLoading } = useLoading();
-    const [step, setStep] = useState(1);
-
+    const { register: registerUser, loading, error, success } = useRegister();
     const {
         register,
         handleSubmit,
-        trigger,
         formState: { errors },
-    } = useForm({
-        defaultValues: {
-            email: "",
-            password: "",
-            full_name: "",
-            phone: "",
-            address: "",
-            date_of_birth: "",
-            role: "USER",
-        },
+    } = useForm<RegisterForm>({
+      defaultValues: {
+        role: "PATIENT"
+      }
     });
-
-    const [registerUser] = useMutation(REGISTER_MUTATION);
-
-    const onSubmit = async (data: any) => {
-        setLoading(true);
+    
+    const onSubmit = async (data: RegisterForm) => {
+        if (data.password !== data.confirmPassword) {
+            toast.error("Mật khẩu nhập lại không khớp", { toastId: "password-mismatch", });
+            return;
+        }
+        
         try {
-            const { email, password, full_name, phone, address, date_of_birth, role } = data;
-            const userData = {
-                email,
-                password,
-                full_name,
-                phone,
-                address,
-                date_of_birth: date_of_birth || null,
-                role,
-            };
-            await registerUser({ variables: { userData } });
-            enqueueSnackbar("Đăng ký thành công!", { variant: "success" });
-
-            router.push("/login");
-        } catch (error) {
-            enqueueSnackbar(getErrorMessage(error), { variant: "error" });
-        } finally {
-            setLoading(false);
+            const payload: RegisterPayload = {
+                email: data.email,
+                password: data.password,
+                role: data.role,
+            }
+            await registerUser(payload);
+        } catch (err) {
+            toast.error(error, { toastId: "register-error" });
+            console.log(err);
         }
     };
-
-    const handleNext = async () => {
-        const result = await trigger(["email", "password"]);
-        if (result) setStep(2);
-    };
-
-    const handleBack = () => setStep(1);
-
+    
+    if (loading) {
+        return (
+          <div className={"min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50 "}>
+              <VscLoading className="animate-spin text-black text-[50px]" />
+          </div>
+        );
+    }
+    if (success) {
+        toast.success('Đăng kí thành công', { toastId: "register-success" });
+    }
+    
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-            <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md bg-white p-6 rounded shadow space-y-4">
-                <div className="flex flex-col items-center">
-                    <div className="bg-blue-500 text-white rounded-full p-3">
-                        <UserPlus className="h-6     w-6" />
-                    </div>
-                    <h2 className="mt-6 text-center text-2xl font-bold text-gray-900">
-                        Đăng ký nếu bạn chưa có tài khoản
-                    </h2>
-                </div>
-                {step === 1 && (
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Địa chỉ email</label>
-                            <input
-                                id="email"
-                                type="email"
+      <div className={"min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white " +
+        "py-12 px-4 sm:px-6 lg:px-8 "
+      }>
+          <div className={"max-w-sm md:max-w-4xl sm:mt-2 lg:mt-4 w-full space-y-6" +
+            "bg-white p-5 rounded-2xl shadow-2xl border border-gray-100"
+          }>
+              <div className={"font-serif mb-5 p-4 border-b-2 italic text-center text-nowrap font-semibold tracking-wide leading-tight shadow-text"}>
+                  <h1 className={"text-xl sm:text-3xl md:text-5xl text-emerald-400"}>
+                      𓍼 Hola Doctor 𓍼
+                  </h1>
+              </div>
+              <div className={"flex flex-col md:flex-row rounded-lg space-x-0 space-y-2 md:space-x-4 md:space-y-0"}>
+                  <form
+                    className={"flex-7 p-4 space-y-6 rounded-lg shadow-sm"}
+                    onSubmit={handleSubmit(onSubmit)}
+                    noValidate
+                  >
+                      <div>
+                          <div className={"mb-2 md:mb-4"}>
+                              <label
+                                htmlFor={"email"}
+                                className={"block indent-4 text-sm sm:text-lg md:text-xl font-bold text-zinc-600 "}
+                              >
+                                  Email:
+                              </label>
+                              <input
+                                id={"email"}
+                                type={"email"}
                                 {...register("email", {
                                     required: "Ô nhập email là bắt buộc",
                                     pattern: {
@@ -93,136 +90,120 @@ const Register = () => {
                                         message: "Vui lòng nhập đúng định dạng email",
                                     },
                                 })}
-                                className={`mt-1 block w-full px-3 py-2 border ${
-                                    errors.email ? "border-red-500" : "border-gray-300"
-                                } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                            />
-                            {errors.email && <p className="mt-1 text-sm text-red-600">{getErrorMessage(errors.email)}</p>}
-                        </div>
-
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Mật khẩu</label>
-                            <div className="relative">
-                                <input
-                                    id="password"
-                                    type={showPassword ? "text" : "password"}
-                                    {...register("password", {
-                                        required: "Mật khẩu là bắt buộc",
-                                        minLength: { value: 6, message: "Ít nhất 6 ký tự" },
-                                    })}
-                                    className={`mt-1 block w-full px-3 py-2 border ${
-                                        errors.password ? "border-red-500" : "border-gray-300"
-                                    } rounded-md shadow-sm pr-10 focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                                />
-                                <div
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute top-2.5 right-3 cursor-pointer text-gray-500"
-                                >
-                                    {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
-                                </div>
-                            </div>
-                            {errors.password && <p className="mt-1 text-sm text-red-600">{getErrorMessage(errors.password)}</p>}
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={handleNext}
-                            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-500"
-                        >
-                            Tiếp theo
-                        </button>
-                    </div>
-                )}
-
-                {step === 2 && (
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">Họ và tên</label>
-                            <input
-                                id="full_name"
-                                {...register("full_name", { required: "Họ tên không được để trống" })}
-                                className={`mt-1 block w-full px-3 py-2 border ${
-                                    errors.full_name ? "border-red-500" : "border-gray-300"
-                                } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                            />
-                            {errors.full_name && <p className="mt-1 text-sm text-red-600">{getErrorMessage(errors.full_name)}</p>}
-                        </div>
-
-                        <div>
-                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Số điện thoại</label>
-                            <input
-                                id="phone"
-                                {...register("phone", {
-                                    pattern: {
-                                        value: /^[0-9]{9,11}$/,
-                                        message: "Số điện thoại không hợp lệ",
+                                className={`mt-2 block w-full px-4 py-3 border text-xs sm:text-sm md:text-base tab ${
+                                  errors.email ? "border-red-500" : "border-gray-300"
+                                } rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-300 transition duration-200`}
+                                placeholder={"nhapemail@domain.com"}
+                              />
+                              {errors.email && (
+                                <p className={"mt-1 indent-4 text-xs sm:text-sm md:text-base text-red-500"}>{getErrorMessage(errors.email)}</p>
+                              )}
+                          </div>
+                          
+                          <div className={"mb-2 md:mb-4"}>
+                              <label
+                                htmlFor={"password"}
+                                className={"block indent-4 text-sm sm:text-lg md:text-xl font-bold text-zinc-600 "}
+                              >
+                                  Mật khẩu:
+                              </label>
+                              <input
+                                id="password"
+                                type="password"
+                                {...register("password", {
+                                    required: "Ô nhập mật khẩu là bắt buộc",
+                                    minLength: {
+                                        value: 6,
+                                        message: "Mật khẩu phải có ít nhất 6 ký tự",
                                     },
                                 })}
-                                className={`mt-1 block w-full px-3 py-2 border ${
-                                    errors.phone ? "border-red-500" : "border-gray-300"
-                                } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                            />
-                            {errors.phone && <p className="mt-1 text-sm text-red-600">{getErrorMessage(errors.phone)}</p>}
-                        </div>
-
-                        <div>
-                            <label htmlFor="address" className="block text-sm font-medium text-gray-700">Địa chỉ</label>
-                            <input
-                                id="address"
-                                {...register("address")}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700">Ngày sinh</label>
-                            <input
-                                id="date_of_birth"
-                                type="date"
-                                {...register("date_of_birth")}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="role" className="block text-sm font-medium text-gray-700">Vai trò</label>
-                            <select
-                                id="role"
-                                {...register("role", { required: "Vai trò là bắt buộc" })}
-                                className={`mt-1 block w-full px-3 py-2 border ${
-                                    errors.role ? "border-red-500" : "border-gray-300"
-                                } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                            >
-                                <option value="USER">Người dùng</option>
-                                <option value="DOCTOR">Bác sĩ</option>
-                                <option value="ADMIN">Quản trị</option>
-                            </select>
-                            {errors.role && <p className="mt-1 text-sm text-red-600">{getErrorMessage(errors.role)}</p>}
-                        </div>
-
-                        <div className="flex justify-between">
-                            <button
-                                type="button"
-                                onClick={handleBack}
-                                className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-400"
-                            >
-                                Quay lại
-                            </button>
-                            <button
-                                type="submit"
-                                className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500"
-                            >
-                                Đăng ký
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                <p className="text-center text-sm">
-                    Đã có tài khoản? <a href="/login" className="text-blue-600 hover:underline">Đăng nhập</a>
-                </p>
-            </form>
-        </div>
+                                className={`mt-2 block w-full px-4 py-3 border text-xs sm:text-sm md:text-base ${
+                                  errors.password ? "border-red-500" : "border-gray-300"
+                                } rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-300 transition duration-200`}
+                                placeholder="Nhập mật khẩu"
+                              />
+                              {errors.password && (
+                                <p className="mt-1 indent-4 text-xs sm:text-sm md:text-base text-red-500">{getErrorMessage(errors.password)}</p>
+                              )}
+                          </div>
+                          
+                          <div className={"mb-2 md:mb-4"}>
+                              <label
+                                htmlFor={"confirmPassword"}
+                                className={"block indent-4 text-sm sm:text-lg md:text-xl font-bold text-zinc-600 "}
+                              >
+                                  Nhập lại mật khẩu:
+                              </label>
+                              <input
+                                id="confirmPassword"
+                                type="password"
+                                {...register("confirmPassword", {
+                                    required: "Ô nhập mật khẩu là bắt buộc",
+                                    minLength: {
+                                        value: 6,
+                                        message: "Mật khẩu phải có ít nhất 6 ký tự",
+                                    },
+                                })}
+                                className={`mt-2 block w-full px-4 py-3 border text-xs sm:text-sm md:text-base ${
+                                  errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                                } rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-300 transition duration-200`}
+                                placeholder="Nhập mật khẩu"
+                              />
+                              {errors.confirmPassword && (
+                                <p className="mt-1 indent-4 text-xs sm:text-sm md:text-base text-red-500">{getErrorMessage(errors.confirmPassword)}</p>
+                              )}
+                          </div>
+                      </div>
+                      
+                      <div>
+                          <button
+                            type={"submit"}
+                            className={"w-full py-3 px-6 rounded-lg shadow-md shadow-teal-700/60 cursor-pointer transition duration-300 " +
+                              "text-sm sm:text-lg md:text-xl text-white font-medium " +
+                              "bg-gradient-to-r from-emerald-300/70 to-teal-600 hover:from-teal-600 hover:to-teal-700 "
+                            }
+                          >
+                              Đăng ký tài khoản
+                          </button>
+                      </div>
+                  </form>
+                  
+                  <div className={"flex flex-col flex-3 items-center justify-evenly space-y-2 rounded-lg shadow-sm"}>
+                      <div className={"flex flex-col items-center w-full space-y-2 border-b-2 border-gray-200"}>
+                          <p className={"text-xs sm:text-sm md:text-base text-zinc-500 text-center"}>
+                              Đăng nhập khác
+                          </p>
+                          <Image
+                            src={"https://yt3.ggpht.com/ytc/AMLnZu_31rROBnB8bq9EJfk82OnclHISQ3Hrx6i1oWLai5o=s900-c-k-c0x00ffffff-no-rj"}
+                            alt={"Google Icon"}
+                            onClick={() => window.location.href = "/register"}
+                            className={"rounded-full shadow-lg  md:w-10 md:h-10 mb-2 cursor-pointer hover:opacity-75 transition duration-300"}
+                            layout={"intrinsic"}
+                            height={40}
+                            width={40}
+                            priority
+                          />
+                      </div>
+                      <div className={"flex flex-col space-y-2 " +
+                        "text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
+                      >
+                          <Button
+                            href={"/login"}
+                            className={"hover:text-blue-800 text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
+                          >
+                              Đăng nhập
+                          </Button>
+                          <Button
+                            href={"/forgot-password"}
+                            className={"hover:text-blue-800 text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
+                          >
+                              Quên mật khẩu?
+                          </Button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
     );
 };
 export default Register;
