@@ -2,7 +2,7 @@
 
 import {useForm} from "react-hook-form";
 import {getErrorMessage} from "@/app/utils/common";
-import React from "react";
+import React, {useEffect} from "react";
 import Image from "next/image";
 import {Button} from "@mui/material";
 import {useRegister} from "@/libs/hooks/auth/useRegister";
@@ -43,16 +43,22 @@ const Register = () => {
         }
     };
     
+    useEffect(() => {
+        if (success) {
+            toast.success("Đăng kí thành công", { toastId: "register-success" });
+            router.push("/login");
+        }
+    }, [router, success]);
+    
     if (loading) {
         return (
-          <div className={"min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50 "}>
+          <div className="min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50">
               <VscLoading className="animate-spin text-black text-[50px]" />
           </div>
         );
     }
-    if (success) {
-        toast.success('Đăng kí thành công', { toastId: "register-success" });
-    }
+    
+    
     
     return (
       <div className={"min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white " +

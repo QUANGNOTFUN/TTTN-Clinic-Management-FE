@@ -1,10 +1,9 @@
-import type { Metadata } from "next";
+import type {Metadata} from "next";
 import "./globals.css";
 import React from "react";
 import Providers from "../../providers";
 import {Geist, Geist_Mono} from "next/font/google";
-import { LoadingProvider } from "./context/loadingContext";
-import PosterCarousel from "@/components/silders/Poster";
+import {LoadingProvider} from "./context/loadingContext";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",

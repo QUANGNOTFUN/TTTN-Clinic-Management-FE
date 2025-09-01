@@ -1,90 +1,60 @@
-import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
-import { jwtDecode } from "jwt-decode";
-import { NextAuthOptions } from "next-auth";
-import NextAuth from "next-auth/next";
-import CredentialsProvider from 'next-auth/providers/credentials';
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import axios from "axios";
 
-const client = new ApolloClient({
-    uri: process.env.GRAPHQL_API_URL,
-    cache: new InMemoryCache(),
-});
-
-const authOptions: NextAuthOptions = {
+const handler = NextAuth({
     providers: [
         CredentialsProvider({
-            name: 'Credentials',
+            name: "Credentials",
             credentials: {
-                email: { label: "Email", type: "email" },
-                password: { label: "Password", type: "password" }
+                email: { label: "Email", type: "text" },
+                password: { label: "Password", type: "password" },
             },
-            async authorize(credentials, req) {
-                if (!credentials?.email || !credentials?.password) return null;
-
-                const mutation = gql`
-                  mutation Login($email: String!, $password: String!) {
-                    login(userData: {
-                      email: $email
-                      password: $password
-                    }) {
-                      accessToken
-                      refreshToken
-                    }
-                  }
-                `;
-
+            async authorize(credentials) {
                 try {
-                    const { data } = await client.mutate({
-                        mutation,
-                        variables: {
-                            email: credentials.email,
-                            password: credentials.password
-                        }
-                    });
-
-                    if (data?.login?.accessToken) {
-                        const decoded: any = jwtDecode(data.login.accessToken);
-
+                    const res = await axios.post(
+                      `${process.env.NEXT_PUBLIC_API_URL}auth/login`,
+                      {
+                          email: credentials?.email,
+                          password: credentials?.password,
+                      }
+                    );
+                    
+                    const user = res.data;
+                    
+                    if (user) {
                         return {
-                            id: decoded.sub, // 👈 lấy id từ JWT
-                            email: credentials.email,
-                            accessToken: data.login.accessToken,
-                            role: decoded.role,
+                            id: user.user.id,
+                            email: user.user.email,
+                            role: user.user.role,
+                            accessToken: user.access_token,
                         };
                     }
-                } catch (error: any) {
-                    console.error("GraphQL Login error:", error?.networkError?.result?.errors);
+                    return null;
+                } catch (e) {
+                    console.log(e);
                     return null;
                 }
-            }
-        })
+            },
+        }),
     ],
-    secret: process.env.NEXTAUTH_SECRET,
-    pages: {
-        signIn: '/login'
-    },
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token.id = user.id; // 👈 lưu id vào token
-                token.email = user.email;
                 token.accessToken = user.accessToken;
                 token.role = user.role;
             }
             return token;
         },
-
         async session({ session, token }) {
-            session.user = {
-                id: token.id, // ✅ sửa ở đây
-                email: token.email,
-                accessToken: token.accessToken,
-                role: token.role,
-            };
+            session.user.role = token.role;
+            session.user.accessToken = token.accessToken;
             return session;
         },
     },
-};
-
-const handler = NextAuth(authOptions);
+    pages: {
+        signIn: "/login",
+    },
+});
 
 export { handler as GET, handler as POST };

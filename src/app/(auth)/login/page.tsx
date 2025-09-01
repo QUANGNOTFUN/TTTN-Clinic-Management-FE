@@ -1,44 +1,38 @@
 'use client';
 
-import { useForm } from "react-hook-form";
-import { getErrorMessage } from "@/app/utils/common";
-import { getSession, signIn } from "next-auth/react";
-import { useSnackbar } from "notistack";
-import { useLoading } from "@/app/context/loadingContext";
-import { toast } from "react-toastify";
+import {useForm} from "react-hook-form";
+import {getErrorMessage} from "@/app/utils/common";
 import {Button} from "@mui/material";
 import Image from 'next/image';
+import {LoginPayload} from "@/models/login";
+import {useLogin} from "@/libs/hooks/auth/useLogin";
+import React from "react";
+import {useRouter} from "next/navigation";
+import {toast} from "react-toastify";
+import {VscLoading} from "react-icons/vsc";
 
 const Login = () => {
-    const { enqueueSnackbar } = useSnackbar();
-    const { setLoading } = useLoading();
+    const router = useRouter();
+    const { login, loading } = useLogin();
     const { register, handleSubmit, formState: { errors } } = useForm();
     
-    const onSubmit = async (data: any) => {
-        setLoading(true);
-        const res = await signIn("credentials", {
-            redirect: false,
-            email: data.email,
-            password: data.password,
-        });
-        
-        if (res?.error) {
-            setLoading(false);
-            enqueueSnackbar("Sai email hoặc mật khẩu", { variant: "error" });
-        } else {
-            const session = await getSession();
-            const role = session?.user?.role;
-            toast.success("Đăng nhập thành công!", { toastId: "login-success" });
-            if (role === "ADMIN") {
-                window.location.href = "/admin-dashboard";
-            } else if (role === "DOCTOR") {
-                window.location.href = "/doctor-dashboard";
-            } else {
-                window.location.href = "/";
-            }
-            setLoading(false);
+    const onSubmit = async (data: LoginPayload) => {
+        try {
+            await login(data);
+            toast.success("Đăng nhập thành công", { toastId: "login-success" });
+            router.push("/");
+        } catch (err) {
+            console.log(err);
         }
     };
+    
+    if (loading) {
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50">
+              <VscLoading className="animate-spin text-black text-[50px]" />
+          </div>
+        );
+    }
     
     return (
         <div className={"min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white " +
@@ -58,8 +52,8 @@ const Login = () => {
                         onSubmit={handleSubmit(onSubmit)}
                         noValidate
                     >
-                      <div className="space-y-6">
-                          <div className={"mb-2 md:mb-8"}>
+                      <div>
+                          <div className={"mb-2 md:mb-4"}>
                               <label
                                 htmlFor={"email"}
                                 className={"block indent-4 text-sm sm:text-lg md:text-xl font-bold text-zinc-600 "}
@@ -86,7 +80,7 @@ const Login = () => {
                               )}
                           </div>
                           
-                          <div>
+                          <div className={"mb-2 md:mb-4"}>
                               <label
                                 htmlFor={"password"}
                                 className={"block indent-4 text-sm sm:text-lg md:text-xl font-bold text-zinc-600 "}
@@ -136,7 +130,7 @@ const Login = () => {
                               src={"https://yt3.ggpht.com/ytc/AMLnZu_31rROBnB8bq9EJfk82OnclHISQ3Hrx6i1oWLai5o=s900-c-k-c0x00ffffff-no-rj"}
                               alt={"Google Icon"}
                               onClick={() => window.location.href = "/register"}
-                              className={"rounded-full shadow-lg  md:w-10 md:h-10 mb-2 cursor-pointer hover:opacity-75 transition duration-300"}
+                              className={"rounded-full shadow-lg md:w-10 md:h-10 mb-2 cursor-pointer hover:opacity-75 transition duration-300"}
                               layout={"intrinsic"}
                               height={40}
                               width={40}
@@ -150,7 +144,7 @@ const Login = () => {
                               href={"/register"}
                               className={"hover:text-blue-800 text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
                             >
-                                Đăng kí ngay!
+                                Đăng kí ngay
                             </Button>
                             <Button
                               href={"/forgot-password"}

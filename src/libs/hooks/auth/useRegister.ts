@@ -13,7 +13,10 @@ export function useRegister() {
 		setSuccess(false);
 		
 		try {
-			const res = await axios.post(`http://localhost:3000/auth/register`, payload);
+			const res = await axios.post(
+				`${process.env.NEXT_PUBLIC_API_URL}auth/register`,
+				payload
+			);
 			setSuccess(true);
 			return res.data;
 		} catch (e) {
