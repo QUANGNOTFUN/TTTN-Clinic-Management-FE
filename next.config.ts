@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['localhost'], // Đặt ở cấp cao nhất, không nằm trong webpack
+    domains: ['localhost' ,'yt3.ggpht.com', 'google.com', 'example.com'],
   },
   webpack(config) {
     config.module.rules.push({
