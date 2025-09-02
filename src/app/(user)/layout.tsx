@@ -4,14 +4,14 @@ import SidebarProfile from "@/app/(user)/_component/organisms/sidebarProfile";
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {
     return (
-        <>
-            <div className="min-h-screen flex bg-gray-50 pt-20"> {/* pt để tránh bị header đè */}
-                <Header />
-                <SidebarProfile />
-                <main className="flex-1 p-8">
-                  {children}
+        <div className={""}>
+            <Header />
+            <div className="flex flex-col md:flex-row bg-gradient-to-r from-slate-200 to-gray-50">
+                <SidebarProfile className={"pt-12 md:pt-16 h-full md:h-screen md:fixed bg-gradient-to-r from-slate-200 to-gray-50 "} />
+                <main className={"md:ml-72 flex-1"}>
+                    {children}
                 </main>
             </div>
-        </>
+        </div>
     );
 }

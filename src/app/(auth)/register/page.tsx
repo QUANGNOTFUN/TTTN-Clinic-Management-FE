@@ -183,7 +183,7 @@ const Register = () => {
                             src={"https://yt3.ggpht.com/ytc/AMLnZu_31rROBnB8bq9EJfk82OnclHISQ3Hrx6i1oWLai5o=s900-c-k-c0x00ffffff-no-rj"}
                             alt={"Google Icon"}
                             onClick={() => window.location.href = "/register"}
-                            className={"rounded-full shadow-lg  md:w-10 md:h-10 mb-2 cursor-pointer hover:opacity-75 transition duration-300"}
+                            className={"rounded-full shadow-lg md:w-10 md:h-10 mb-2 cursor-pointer hover:opacity-75 transition duration-300"}
                             layout={"intrinsic"}
                             height={40}
                             width={40}
