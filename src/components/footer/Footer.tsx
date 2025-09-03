@@ -3,8 +3,8 @@ import Link from "next/link";
 
 export default function Footer() {
     return (
-        <footer className="bg-gray-200 text-gray-700">
-            <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <footer className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-slate-200 to-gray-50 text-gray-700">
+            <div className="w-full mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
                     <h2 className="text-xl font-semibold text-blue-700 mb-3">Y Tế Thông Minh</h2>
                     <p className="text-sm">

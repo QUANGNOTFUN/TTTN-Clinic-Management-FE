@@ -23,7 +23,7 @@ export function useGetPatient() {
 				setError(null);
 				
 				const res = await axios.get<Patient>(
-					`${process.env.NEXT_PUBLIC_API_URL}patient/get-patient-by-id`,
+					`${process.env.NEXT_PUBLIC_API_URL}patients/findOne`,
 					{
 						headers: {
 							Authorization: `Bearer ${session?.user?.accessToken}`,
