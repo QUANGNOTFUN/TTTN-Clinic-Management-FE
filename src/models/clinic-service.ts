@@ -7,4 +7,5 @@ export type ClinicServiceResponse = {
 	isActive: boolean;
 	createdAt: string;
 	updatedAt: string;
+	requiresDoctorSelection?: boolean;
 };

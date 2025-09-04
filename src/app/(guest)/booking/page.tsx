@@ -1,43 +1,101 @@
 "use client";
 
-import {motion} from "framer-motion";
-import {ClinicServicesCard} from "@/app/(guest)/booking/_components/molecules/ClinicServicesCard";
-import {useFindAllClinicServices} from "@/libs/hooks/clinic-services/useFindAllClinicServices";
-import {useState} from "react";
+import { motion } from "framer-motion";
+import { ClinicServicesCard } from "@/app/(guest)/booking/_components/molecules/ClinicServicesCard";
+import { useFindAllClinicServices } from "@/libs/hooks/clinic-services/useFindAllClinicServices";
+import React, { useState, useEffect } from "react";
+import { Navigation, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { VscLoading } from "react-icons/vsc";
+import { AppointmentFormCard } from "./_components/organism/AppointmentFormCard";
 
 export default function BookingPage() {
     const { data, loading } = useFindAllClinicServices();
-    const [isSelected, setSelected] = useState<string | null>('asda');
+    const [isSelected, setSelected] = useState<string | null>(null);
     
-    if (loading) return <p>Đang tải...</p>;
+    useEffect(() => {
+        if (data && data.length > 0 && !isSelected) {
+            setSelected(data[0].id);
+        }
+    }, [data, isSelected]);
+    
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50">
+                <VscLoading className="animate-spin text-black text-[50px]" />
+            </div>
+        );
+    }
     
     return (
-        <div className={'flex min-h-screen pt-14 p-6'}>
-            {/*{Main Selected}*/}
-            <div className={"flex-3 flex flex-col items-center justify-center h-150"}>
+        <div className="flex flex-col md:flex-row min-h-screen pt-16 p-6 gap-6">
+            {/* Left - Main Selected */}
+            <div className="w-full md:w-2/5 lg:w-1/3 flex flex-col items-center justify-center">
                 {isSelected && (
-                    <ClinicServicesCard className={'w-7/10 h-9/10'} item={data[0]} />
+                    <ClinicServicesCard
+                        className="w-[70%] h-[10vh] md:h-[80vh] max-h-[800px]"
+                        url_image={"https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-39f4-61fa-a38d-f1f082280c0d/raw?se=2025-09-03T22%3A16%3A15Z&sp=r&sv=2024-08-04&sr=b&scid=b5071798-c451-5704-8159-8598392bb00e&skoid=cb94e22a-e3df-4e6a-9e17-1696f40fa435&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-09-03T19%3A16%3A31Z&ske=2025-09-04T19%3A16%3A31Z&sks=b&skv=2024-08-04&sig=7Niu/%2Bl4b0YDL11R/SkSX7%2B/QZWlZfZNzfJFpNlI/7I%3D"}
+                        item={data.find((s) => s.id === isSelected) || data[0]}
+                        isSelected={true}
+                    />
                 )}
             </div>
-            <div className={"flex-7 flex flex-col"}>
-                {/*{ Property Of Selected Service }*/}
-                <div className={"flex-8 flex flex-col items-center justify-center h-150"}>
-                    <ClinicServicesCard className={'w-9/10 h-8/10'} item={data[0]} />
+            
+            {/* Right - Properties + List */}
+            <div className={"w-full md:w-3/5 lg:w-2/3 flex flex-col gap-2"}>
+                {/* Properties */}
+                <div className={"flex items-center justify-center"}>
+                    <AppointmentFormCard
+                        className="flex[8] w-[90%] h-[70vh] max-h-[600px]"
+                        service={data.find((s) => s.id === isSelected) || data[0]}
+                    />
                 </div>
-                {/*{ List Clinic Services }*/}
-                <div className={"flex-2 justify-center bottom-10 right-10 flex gap-4"}>
-                    {data.map((service, i) => (
-                        <motion.div
-                            key={service.id}
-                            layoutId={service.id} // để framer biết "cùng 1 card"
-                            initial={{ opacity: 0, x: 50, y: 50 }}
-                            animate={{ opacity: 1, x: 0, y: 0 }}
-                            transition={{ delay: i * 0.2, type: "spring", stiffness: 100 }}
-                            onClick={() => setSelected(service.id)}
-                        >
-                            <ClinicServicesCard className={'w-9/10 h-9/10'} item={service} />
-                        </motion.div>
-                    ))}
+                
+                {/* List Clinic Services */}
+                <div className="flex flex-row justify-center items-center flex-[3] relative">
+                    <Swiper
+                        modules={[Navigation, Pagination]}
+                        spaceBetween={20}
+                        slidesPerView={2}
+                        navigation={{
+                            nextEl: ".custom-next",
+                            prevEl: ".custom-prev",
+                        }}
+                        pagination={{ clickable: true }}
+                        breakpoints={{
+                            640: { slidesPerView: 2 }, // sm
+                            768: { slidesPerView: 3 }, // md
+                            1024: { slidesPerView: 4 }, // lg
+                        }}
+                        className="w-full max-w-4xl px-12"
+                    >
+                        {data
+                            .filter((service) => service.id !== isSelected) // ẩn cái đang chọn
+                            .map((service) => (
+                                <SwiperSlide key={service.id}>
+                                    <motion.div
+                                        layoutId={service.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ type: "spring", stiffness: 100 }}
+                                        onClick={() => setSelected(service.id)}
+                                    >
+                                        <ClinicServicesCard className="w-full h-25 cursor-pointer" item={service} />
+                                    </motion.div>
+                                </SwiperSlide>
+                            ))}
+                    </Swiper>
+                    
+                    {/* Custom Navigation Buttons */}
+                    <button className="custom-prev absolute left-0 z-10 bg-white shadow-md rounded-full p-3 hover:bg-gray-100 cursor-pointer">
+                        ◀
+                    </button>
+                    <button className="custom-next absolute right-0 z-10 bg-white shadow-md rounded-full p-3 hover:bg-gray-100 cursor-pointer">
+                        ▶
+                    </button>
                 </div>
             </div>
         </div>

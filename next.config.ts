@@ -3,6 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     domains: ['localhost' ,'yt3.ggpht.com', 'google.com', 'example.com'],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "sdmntpraustraliaeast.oaiusercontent.com",
+      },
+    ],
   },
   webpack(config) {
     config.module.rules.push({
