@@ -1,6 +1,5 @@
 "use client";
 
-import useAuth from "@/libs/hooks/auth/useAuth";
 import { ReactNode } from "react";
 
 const ProtectedLayout = ({ children }: { children: ReactNode }) => {
@@ -21,3 +20,7 @@ const ProtectedLayout = ({ children }: { children: ReactNode }) => {
 }
 
 export default ProtectedLayout;
+
+function useAuth(): { session: any; status: any; } {
+    throw new Error("Function not implemented.");
+}

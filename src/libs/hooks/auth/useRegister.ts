@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {RegisterPayload} from "@/models/register";
+import {RegisterPayload} from "@/types/register";
 import axios from "axios";
 
 export function useRegister() {

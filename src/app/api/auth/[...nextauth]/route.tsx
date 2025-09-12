@@ -2,6 +2,15 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 
+export type SessionUser = {
+    id: string;
+    email: string;
+    role: string;
+    accessToken: string;
+    name?: string | null;
+    image?: string | null;
+}
+
 const handler = NextAuth({
     providers: [
         CredentialsProvider({
@@ -41,14 +50,19 @@ const handler = NextAuth({
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token.accessToken = user.accessToken;
-                token.role = user.role;
+                const sessionUser = user as SessionUser;
+                token.accessToken = sessionUser.accessToken;
+                token.role = sessionUser.role;
             }
             return token;
         },
         async session({ session, token }) {
-            session.user.role = token.role;
-            session.user.accessToken = token.accessToken;
+            if (session.user) {
+                session.user.id = token.id;
+                session.user.email = token.email;
+                session.user.role = token.role;
+                session.user.accessToken = token.accessToken;
+            }
             return session;
         },
     },

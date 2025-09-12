@@ -1,10 +1,8 @@
-import type {Metadata} from "next";
-import ServiceCard from "@/components/cards/ServiceCard";
+'use client'
 
-export const metadata: Metadata = {
-    title: "Trang Chủ - Y Tế Thông Minh",
-    description: "Khám phá các dịch vụ y tế chất lượng cao, đặt lịch dễ dàng.",
-};
+import ServiceCard from "@/components/cards/ServiceCard";
+import HeroBanner from "@/components/banner/HeroBanner";
+import React from "react";
 
 const services = [
     { icon: '🩺', title: 'Khám tổng quát', description: 'Kiểm tra sức khỏe toàn diện với bác sĩ chuyên khoa.' },
@@ -13,8 +11,12 @@ const services = [
 ];
 
 export default function HomePage() {
+    
     return (
-        <div className="flex flex-col">
+        <div className="relative flex flex-col">
+            {/*Banner*/}
+            <HeroBanner />
+            
             {/* Services Section */}
             <section className="h-screen flex items-center bg-gradient-to-r from-slate-200 to-gray-50 dark:bg-gray-800 animate-fade-in-down">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

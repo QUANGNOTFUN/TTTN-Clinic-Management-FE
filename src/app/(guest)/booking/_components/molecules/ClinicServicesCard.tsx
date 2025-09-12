@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ClinicServiceResponse } from "@/models/clinic-service";
+import { ClinicServiceResponse } from "@/types/clinic-service";
 
 export type ClinicServicesCardType = {
 	className: string;
@@ -48,6 +48,7 @@ export function ClinicServicesCard(props: ClinicServicesCardType) {
 			{/* Name Clinic Service */}
 			<p
 				className={`
+				  mb-4 md:mb-0
 		          text-center italic tracking-wide
 		          ${isSelected ? "font-semibold text-lg sm:text-xl md:text-2xl" : "font-medium text-sm sm:text-base md:text-lg"}
 		          text-gray-100 group-hover:text-indigo-200 transition-colors

@@ -6,7 +6,7 @@ import React, {useEffect} from "react";
 import Image from "next/image";
 import {Button} from "@mui/material";
 import {useRegister} from "@/libs/hooks/auth/useRegister";
-import {RegisterForm, RegisterPayload} from "@/models/register";
+import {RegisterForm, RegisterPayload} from "@/types/register";
 import {useRouter} from "next/navigation";
 import {toast} from "react-toastify";
 import {VscLoading} from "react-icons/vsc";

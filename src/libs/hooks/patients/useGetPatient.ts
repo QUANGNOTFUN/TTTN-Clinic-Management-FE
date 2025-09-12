@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Patient } from "@/models/patient";
+import { Patient } from "@/types/patient";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
 

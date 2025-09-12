@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {ClinicServiceResponse} from "@/models/clinic-service";
+import {ClinicServiceResponse} from "@/types/clinic-service";
 import axios from "axios";
 
 export function useFindAllClinicServices() {

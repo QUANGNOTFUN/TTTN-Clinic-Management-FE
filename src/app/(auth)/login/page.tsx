@@ -4,7 +4,7 @@ import {useForm} from "react-hook-form";
 import {getErrorMessage} from "@/app/utils/common";
 import {Button} from "@mui/material";
 import Image from 'next/image';
-import {LoginPayload} from "@/models/login";
+import {LoginPayload} from "@/types/login";
 import {useLogin} from "@/libs/hooks/auth/useLogin";
 import React from "react";
 import {useRouter} from "next/navigation";

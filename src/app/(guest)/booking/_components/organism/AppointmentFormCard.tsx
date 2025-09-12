@@ -1,7 +1,11 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ClinicServiceResponse } from "@/models/clinic-service";
+import { ClinicServiceResponse } from "@/types/clinic-service";
+import {useCreateAppointmentRequest} from "@/libs/hooks/appointment-request/useCreateAppointmentRequest";
+import React, {useEffect} from "react";
+import {toast} from "react-toastify";
+import {CreateAppointmentRequestDto} from "@/types/appointment-request";
 
 // Props
 export type AppointmentFormCardProps = {
@@ -12,17 +16,18 @@ export type AppointmentFormCardProps = {
 
 // Validation schema
 const formSchema = z.object({
-	idService: z.string(),
-	idUser: z.string(),
-	name: z.string().min(3, "Tên phải có ít nhất 3 ký tự"),
-	phone: z.string().regex(/^\d{9,11}$/, "Số điện thoại phải từ 9–11 số"),
+	service_id: z.string().uuid({ message: "Service ID không hợp lệ" }),
+	patient_id: z.string().uuid({ message: "User ID không hợp lệ" }),
+	full_name: z.string().min(3, "Tên phải có ít nhất 3 ký tự"),
+	phone_number: z.string().regex(/^\d{9,11}$/, { message: "Số điện thoại phải từ 9–11 số" }),
 	doctorId: z.string().optional(),
-	date: z.string().min(1, "Vui lòng chọn ngày"),
+	date: z.string().min(1, { message: "Vui lòng chọn ngày" }),
 	shift: z.enum(["MORNING", "AFTERNOON"], {
 		message: "Vui lòng chọn ca làm việc",
 	}),
-	time: z.string().min(1, "Vui lòng chọn giờ"),
+	time: z.string().min(1, { message: "Vui lòng chọn giờ" }),
 });
+
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -37,12 +42,23 @@ export function AppointmentFormCard(props: AppointmentFormCardProps) {
 	} = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			idService: service?.id ?? "",
-			idUser: userId,
+			service_id: service?.id ?? "",
+			patient_id: userId ?? "",
 			date: new Date().toISOString().split("T")[0],
 			time: new Date().toTimeString().slice(0, 5),
 		},
 	});
+	const { create, data, error  } = useCreateAppointmentRequest();
+	
+	
+	useEffect(() => {
+		if (error) {
+			toast.error(`Lỗi: ${error}`);
+		}
+		if (data) {
+			toast.success(data?.message);
+		}
+	}, [data, error]);
 	
 	const shift = watch("shift"); // 👀 theo dõi shift
 	const timeRange =
@@ -53,9 +69,37 @@ export function AppointmentFormCard(props: AppointmentFormCardProps) {
 				: undefined;
 	
 	const onSubmit = async (data: FormValues) => {
-		console.log("Booking info:", data);
-		// 🚀 call API here
-		reset();
+		try {
+			console.log("✅ Submit data:", data);
+			// Ghép date + time
+			let appointmentDateTime = new Date(`${data.date}T${data.time}:00`);
+			
+			// Ràng buộc theo ca làm việc
+			if (data.shift === "MORNING") {
+				const minMorning = new Date(`${data.date}T08:00:00`);
+				const maxMorning = new Date(`${data.date}T11:30:00`);
+				if (appointmentDateTime < minMorning) appointmentDateTime = minMorning;
+				if (appointmentDateTime > maxMorning) appointmentDateTime = maxMorning;
+			} else if (data.shift === "AFTERNOON") {
+				const minAfternoon = new Date(`${data.date}T13:30:00`);
+				const maxAfternoon = new Date(`${data.date}T17:00:00`);
+				if (appointmentDateTime < minAfternoon) appointmentDateTime = minAfternoon;
+				if (appointmentDateTime > maxAfternoon) appointmentDateTime = maxAfternoon;
+			}
+			
+			const payload: CreateAppointmentRequestDto = {
+				full_name: data.full_name,
+				phone_number: data.phone_number,
+				patient_id: data.patient_id!,
+				service_id: data.service_id!,
+				appointment_time: appointmentDateTime.toISOString(),
+			}
+			await create(payload);
+			
+			reset();
+		} catch (err) {
+			console.error("❌ Error booking appointment:", err);
+		}
 	};
 	
 	return (
@@ -72,8 +116,8 @@ export function AppointmentFormCard(props: AppointmentFormCardProps) {
 		>
 			<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-full">
 				{/* Hidden fields */}
-				<input type="hidden" {...register("idService")} />
-				<input type="hidden" {...register("idUser")} />
+				<input type="hidden" {...register("service_id")} />
+				<input type="hidden" {...register("patient_id")} />
 				
 				{/* Full name */}
 				<div className="flex items-center gap-4">
@@ -81,13 +125,13 @@ export function AppointmentFormCard(props: AppointmentFormCardProps) {
 					<div className="flex-1">
 						<input
 							type="text"
-							{...register("name")}
+							{...register("full_name")}
 							placeholder="Nhập họ và tên"
 							className="w-full px-4 py-2 rounded-lg border border-gray-600 bg-slate-800
 		                       text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-indigo-400
 		                       text-sm md:text-base"
 						/>
-						{errors.name && <p className="text-red-400 text-sm ml-4 mt-1">{errors.name.message}</p>}
+						{errors.full_name && <p className="text-red-400 text-sm ml-4 mt-1">{errors.full_name.message}</p>}
 					</div>
 				</div>
 				
@@ -97,18 +141,18 @@ export function AppointmentFormCard(props: AppointmentFormCardProps) {
 					<div className="flex-1">
 						<input
 							type="tel"
-							{...register("phone")}
+							{...register("phone_number")}
 							placeholder="Nhập số điện thoại"
 							className="w-full px-4 py-2 rounded-lg border border-gray-600 bg-slate-800
 		                       text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-indigo-400
 		                       text-sm md:text-base"
 						/>
-						{errors.phone && <p className="text-red-400 text-sm ml-4 mt-1">{errors.phone.message}</p>}
+						{errors.phone_number && <p className="text-red-400 text-sm ml-4 mt-1">{errors.phone_number.message}</p>}
 					</div>
 				</div>
 				
 				{/* Doctor selection if required */}
-				{service?.requiresDoctorSelection && (
+				{service?.requires_doctor && (
 					<div className="flex items-center gap-4">
 						<label className="w-32 text-gray-200 text-sm md:text-base">Chọn bác sĩ</label>
 						<div className="flex-1">
@@ -193,15 +237,16 @@ export function AppointmentFormCard(props: AppointmentFormCardProps) {
 					<button
 						type="submit"
 						className="w-[50%] mt-4 py-3 px-6 rounded-lg
-		                  bg-gradient-to-br from-gray-500 via-gray-600 to-gray-900
-		                  text-white font-medium shadow-md
-		                  hover:from-slate-800 hover:via-gray-700 hover:to-gray-700
-		                  transition-all duration-300 text-sm md:text-base
-		                  cursor-pointer"
+					      bg-gradient-to-br from-gray-500 via-gray-600 to-gray-900
+					      text-white font-medium shadow-md
+					      hover:from-slate-800 hover:via-gray-700 hover:to-gray-700
+					      transition-all duration-200 ease-in-out transform active:scale-95
+					      text-sm md:text-base cursor-pointer"
 					>
 						Xác nhận đặt lịch
 					</button>
 				</div>
+			
 			</form>
 		</div>
 	);

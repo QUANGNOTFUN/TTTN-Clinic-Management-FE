@@ -16,7 +16,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-      <ProtectedLayout>
+      // <ProtectedLayout>
       <AdminClientWrapper>
         {children}
         <ToastContainer
@@ -32,6 +32,6 @@ export default function AdminLayout({
           theme={"light"}
         />
       </AdminClientWrapper>
-      </ProtectedLayout>
+      // </ProtectedLayout>
   );
 }

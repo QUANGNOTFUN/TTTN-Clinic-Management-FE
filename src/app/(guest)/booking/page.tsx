@@ -1,20 +1,22 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ClinicServicesCard } from "@/app/(guest)/booking/_components/molecules/ClinicServicesCard";
-import { useFindAllClinicServices } from "@/libs/hooks/clinic-services/useFindAllClinicServices";
-import React, { useState, useEffect } from "react";
-import { Navigation, Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
+import {motion} from "framer-motion";
+import {ClinicServicesCard} from "@/app/(guest)/booking/_components/molecules/ClinicServicesCard";
+import {useFindAllClinicServices} from "@/libs/hooks/clinic-services/useFindAllClinicServices";
+import React, {useEffect, useState} from "react";
+import {Navigation, Pagination} from "swiper/modules";
+import {Swiper, SwiperSlide} from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { VscLoading } from "react-icons/vsc";
-import { AppointmentFormCard } from "./_components/organism/AppointmentFormCard";
+import {VscLoading} from "react-icons/vsc";
+import {AppointmentFormCard} from "./_components/organism/AppointmentFormCard";
+import {useGetPatient} from "@/libs/hooks/patients/useGetPatient";
 
 export default function BookingPage() {
     const { data, loading } = useFindAllClinicServices();
     const [isSelected, setSelected] = useState<string | null>(null);
+    const { patient } = useGetPatient()
     
     useEffect(() => {
         if (data && data.length > 0 && !isSelected) {
@@ -26,6 +28,13 @@ export default function BookingPage() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50">
                 <VscLoading className="animate-spin text-black text-[50px]" />
+            </div>
+        );
+    }
+    if (!data || data.length === 0) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50">
+                <p className="text-black text-[50px]">Không có dịch vụ nào</p>
             </div>
         );
     }
@@ -51,6 +60,7 @@ export default function BookingPage() {
                     <AppointmentFormCard
                         className="flex[8] w-[90%] h-[70vh] max-h-[600px]"
                         service={data.find((s) => s.id === isSelected) || data[0]}
+                        userId={patient?.user_id}
                     />
                 </div>
                 
