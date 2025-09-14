@@ -2,14 +2,14 @@
 
 import {useForm} from "react-hook-form";
 import {getErrorMessage} from "@/app/utils/common";
-import {Button} from "@mui/material";
 import Image from 'next/image';
 import {LoginPayload} from "@/types/login";
-import {useLogin} from "@/libs/hooks/auth/useLogin";
+import {useLogin} from "@/lib/hooks/auth/useLogin";
 import React from "react";
 import {useRouter} from "next/navigation";
 import {toast} from "react-toastify";
 import {VscLoading} from "react-icons/vsc";
+import Link from "next/link";
 
 const Login = () => {
     const router = useRouter();
@@ -19,8 +19,8 @@ const Login = () => {
     const onSubmit = async (data: LoginPayload) => {
         try {
             await login(data);
-            toast.success("Đăng nhập thành công", { toastId: "login-success" });
             router.push("/");
+            toast.success("Đăng nhập thành công", { toastId: "login-success" });
         } catch (err) {
             console.log(err);
         }
@@ -140,18 +140,18 @@ const Login = () => {
                         <div className={"flex flex-col space-y-2 " +
                           "text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
                         >
-                            <Button
+                            <Link
                               href={"/register"}
                               className={"hover:text-blue-800 text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
                             >
                                 Đăng kí ngay
-                            </Button>
-                            <Button
+                            </Link>
+                            <Link
                               href={"/forgot-password"}
                               className={"hover:text-blue-800 text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
                             >
                                 Quên mật khẩu?
-                            </Button>
+                            </Link>
                         </div>
                     </div>
               </div>

@@ -1,6 +1,6 @@
 'use client'
 import AdminScheduleLayout from "@/app/(admin)/_components/organisms/adminSchedulesTable/AdminScheduleLayout";
-import {useGetDoctors} from "@/libs/hooks/doctors/useGetDoctors";
+import {useGetDoctors} from "@/lib/hooks/doctors/useGetDoctors";
 import {CreateDoctorScheduleData, DoctorSchedule, WeekDateInput} from "@/types/doctorSchedule";
 import {useCallback, useState} from "react";
 import AdminForm from "@/app/(admin)/_components/organisms/create&UpdateForm/AdminForm";
@@ -8,7 +8,7 @@ import {CREATE_DOCTOR_SCHEDULE_INPUT} from "@/app/(admin)/schedule-manage/consta
 import {useCreateDoctorSchedule} from "@/libs/hooks/doctorSchedules/useCreateDoctorSchedule";
 import {toast} from "react-toastify";
 import {useGetDoctorSchedulesByWeekDate} from "@/libs/hooks/doctorSchedules/useGetDoctorSchedulesByWeekDate";
-import {getWeekDates} from "@/libs/function/getWeekDates";
+import {getWeekDates} from "@/lib/function/getWeekDates";
 import {useDeleteDoctorSchedule} from "@/libs/hooks/doctorSchedules/useDeleteDoctorSchedule";
 
 export default function AdminSchedulePage() {

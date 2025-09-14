@@ -11,7 +11,7 @@ type ProvidersProps = {
 
 const queryClient = new QueryClient()
 
-const Providers = ({ children }: ProvidersProps) => {
+const RootProvider = ({ children }: ProvidersProps) => {
   return (
     <SessionProvider>
       <QueryClientProvider  client={queryClient}>
@@ -26,4 +26,4 @@ const Providers = ({ children }: ProvidersProps) => {
   )
 }
 
-export default Providers;
+export default RootProvider;

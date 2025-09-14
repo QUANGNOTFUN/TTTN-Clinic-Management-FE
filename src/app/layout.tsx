@@ -1,9 +1,8 @@
 import type {Metadata} from "next";
 import "./globals.css";
-import React from "react";
-import Providers from "../../providers";
+import React from "react"
 import {Geist, Geist_Mono} from "next/font/google";
-import {LoadingProvider} from "./context/loadingContext";
+import RootProvider from "@/components/wrapper/RootProvider";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -24,11 +23,9 @@ export default function RootLayout({children, }: Readonly<{ children: React.Reac
 	return (
 		<html lang="vi" className={`${geistSans.variable} ${geistMono.variable}`}>
 		<body>
-		<LoadingProvider>
-		<Providers>
+		<RootProvider>
 			{children}
-		</Providers>
-		</LoadingProvider>
+		</RootProvider>
 		</body>
 		</html>
 	);

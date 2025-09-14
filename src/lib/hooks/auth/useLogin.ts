@@ -1,11 +1,12 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import {LoginPayload} from "@/types/login";
 
 export function useLogin() {
 	const [loading, setLoading] = useState(false);
 	
-	const login = async (payload: { email: string; password: string }) => {
+	const login = async (payload: LoginPayload) => {
 		setLoading(true);
 		try {
 			const res = await signIn("credentials", {

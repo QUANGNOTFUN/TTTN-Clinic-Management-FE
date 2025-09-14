@@ -10,10 +10,10 @@ import {
   INIT_CREATE_DOCTOR_FORM,
   INIT_UPDATE_DOCTOR_FORM
 } from "@/app/(admin)/doctor-manage/values/constants";
-import { useGetDoctors } from "@/libs/hooks/doctors/useGetDoctors";
-import { useRegisterDoctor } from "@/libs/hooks/doctors/useCreateDoctor";
-import { useUpdateDoctor } from "@/libs/hooks/doctors/useUpdateDoctor";
-import { useDeleteDoctor } from "@/libs/hooks/doctors/userDeleteDoctor";
+import { useGetDoctors } from "@/lib/hooks/doctors/useGetDoctors";
+import { useRegisterDoctor } from "@/lib/hooks/doctors/useCreateDoctor";
+import { useUpdateDoctor } from "@/lib/hooks/doctors/useUpdateDoctor";
+import { useDeleteDoctor } from "@/lib/hooks/doctors/userDeleteDoctor";
 import AdminForm from "@/app/(admin)/_components/organisms/create&UpdateForm/AdminForm";
 import {RegisterDoctorInput} from "@/types/register";
 import {UpdateDoctorInput} from "@/types/doctors";

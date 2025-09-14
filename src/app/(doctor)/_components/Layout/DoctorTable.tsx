@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {ColumnDef, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
-import {formatNumberWithCommas} from "@/libs/function/formatNumberWithCommas";
+import {formatNumberWithCommas} from "@/lib/function/formatNumberWithCommas";
 
 export interface HeaderDoctorTable {
     label: string;

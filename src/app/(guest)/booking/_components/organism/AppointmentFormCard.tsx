@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ClinicServiceResponse } from "@/types/clinic-service";
-import {useCreateAppointmentRequest} from "@/libs/hooks/appointment-request/useCreateAppointmentRequest";
+import {useCreateAppointmentRequest} from "@/lib/hooks/appointment-request/useCreateAppointmentRequest";
 import React, {useEffect} from "react";
 import {toast} from "react-toastify";
 import {CreateAppointmentRequestDto} from "@/types/appointment-request";

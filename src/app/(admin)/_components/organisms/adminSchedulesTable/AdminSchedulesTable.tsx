@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {ColumnDef, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
 import {Maximize2Icon, UserMinus, UserPlus} from "lucide-react";
-import {getWeekDates} from "@/libs/function/getWeekDates";
+import {getWeekDates} from "@/lib/function/getWeekDates";
 import {ViewDoctorListCard} from "@/app/(admin)/_components/organisms/adminSchedulesTable/ViewDoctorListCard";
 import {CreateDoctorScheduleData, DoctorSchedule} from "@/types/doctorSchedule";
 

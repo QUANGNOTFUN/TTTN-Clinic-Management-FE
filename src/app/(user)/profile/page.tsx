@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetPatient } from "@/libs/hooks/patients/useGetPatient";
+import { useGetPatient } from "@/lib/hooks/patients/useGetPatient";
 import { VscLoading } from "react-icons/vsc";
 import Image from "next/image";
 
@@ -65,8 +65,8 @@ export default function ProfilePage() {
     ];
     
     return (
-        <div className="min-h-screen pt-24 p-6 bg-zinc-50  overflow-y-auto">
-            <div className="max-w-5xl mx-auto space-y-8">
+        <div className="min-h-screen pt-14 p-6 bg-transparent  overflow-y-auto">
+            <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row items-center gap-6 bg-white p-6 rounded-2xl shadow-lg">
                     <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-md">

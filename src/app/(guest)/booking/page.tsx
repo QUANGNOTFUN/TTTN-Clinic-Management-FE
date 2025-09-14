@@ -2,7 +2,7 @@
 
 import {motion} from "framer-motion";
 import {ClinicServicesCard} from "@/app/(guest)/booking/_components/molecules/ClinicServicesCard";
-import {useFindAllClinicServices} from "@/libs/hooks/clinic-services/useFindAllClinicServices";
+import {useFindAllClinicServices} from "@/lib/hooks/clinic-services/useFindAllClinicServices";
 import React, {useEffect, useState} from "react";
 import {Navigation, Pagination} from "swiper/modules";
 import {Swiper, SwiperSlide} from "swiper/react";
@@ -11,7 +11,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import {VscLoading} from "react-icons/vsc";
 import {AppointmentFormCard} from "./_components/organism/AppointmentFormCard";
-import {useGetPatient} from "@/libs/hooks/patients/useGetPatient";
+import {useGetPatient} from "@/lib/hooks/patients/useGetPatient";
 
 export default function BookingPage() {
     const { data, loading } = useFindAllClinicServices();

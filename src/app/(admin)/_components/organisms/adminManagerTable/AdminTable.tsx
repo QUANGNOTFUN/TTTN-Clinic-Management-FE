@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {formatNumberWithCommas} from "@/libs/function/formatNumberWithCommas";
+import {formatNumberWithCommas} from "@/lib/function/formatNumberWithCommas";
 import {ColumnDef, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
 
 export interface HeaderAdminTable {

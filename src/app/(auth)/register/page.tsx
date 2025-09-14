@@ -4,61 +4,62 @@ import {useForm} from "react-hook-form";
 import {getErrorMessage} from "@/app/utils/common";
 import React, {useEffect} from "react";
 import Image from "next/image";
-import {Button} from "@mui/material";
-import {useRegister} from "@/libs/hooks/auth/useRegister";
+import {AxiosError} from "axios";
+import {useRegister} from "@/lib/hooks/auth/useRegister";
 import {RegisterForm, RegisterPayload} from "@/types/register";
 import {useRouter} from "next/navigation";
 import {toast} from "react-toastify";
 import {VscLoading} from "react-icons/vsc";
+import Link from "next/link";
 
 const Register = () => {
     const router = useRouter();
-    const { register: registerUser, loading, error, success } = useRegister();
     const {
-        register,
-        handleSubmit,
-        formState: { errors },
+        mutate: mutateRegister, isPending, isError, error, isSuccess,
+    } = useRegister();
+    
+    const {
+        register: formRegister, handleSubmit, formState: { errors },
     } = useForm<RegisterForm>({
-      defaultValues: {
-        role: "PATIENT"
-      }
+        defaultValues: {
+            role: "PATIENT",
+        },
     });
     
     const onSubmit = async (data: RegisterForm) => {
         if (data.password !== data.confirmPassword) {
-            toast.error("Mật khẩu nhập lại không khớp", { toastId: "password-mismatch", });
+            toast.error("Mật khẩu nhập lại không khớp", {
+                toastId: "password-mismatch",
+            });
             return;
         }
         
-        try {
-            const payload: RegisterPayload = {
-                email: data.email,
-                password: data.password,
-                role: data.role,
-            }
-            await registerUser(payload);
-        } catch (err) {
-            toast.error(error, { toastId: "register-error" });
-            console.log(err);
-        }
+        const payload: RegisterPayload = {
+            email: data.email,
+            password: data.password,
+            role: data.role,
+        };
+        
+        mutateRegister(payload);
     };
     
     useEffect(() => {
-        if (success) {
-            toast.success("Đăng kí thành công", { toastId: "register-success" });
+        if (isSuccess) {
+            toast.success("Đăng ký thành công", { toastId: "register-success" });
             router.push("/login");
         }
-    }, [router, success]);
+        if (isError) {
+            toast.error(error?.message || "Đăng ký thất bại", { toastId: "register-error" });
+        }
+    }, [error?.message, isError, isSuccess, router]);
     
-    if (loading) {
+    if (isPending) {
         return (
-          <div className="min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50">
-              <VscLoading className="animate-spin text-black text-[50px]" />
-          </div>
+            <div className="min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50">
+                <VscLoading className="animate-spin text-black text-[50px]" />
+            </div>
         );
     }
-    
-    
     
     return (
       <div className={"min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white " +
@@ -89,7 +90,7 @@ const Register = () => {
                               <input
                                 id={"email"}
                                 type={"email"}
-                                {...register("email", {
+                                {...formRegister("email", {
                                     required: "Ô nhập email là bắt buộc",
                                     pattern: {
                                         value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -116,7 +117,7 @@ const Register = () => {
                               <input
                                 id="password"
                                 type="password"
-                                {...register("password", {
+                                {...formRegister("password", {
                                     required: "Ô nhập mật khẩu là bắt buộc",
                                     minLength: {
                                         value: 6,
@@ -143,7 +144,7 @@ const Register = () => {
                               <input
                                 id="confirmPassword"
                                 type="password"
-                                {...register("confirmPassword", {
+                                {...formRegister("confirmPassword", {
                                     required: "Ô nhập mật khẩu là bắt buộc",
                                     minLength: {
                                         value: 6,
@@ -190,21 +191,21 @@ const Register = () => {
                             priority
                           />
                       </div>
-                      <div className={"flex flex-col space-y-2 " +
+                      <div className={"flex flex-col space-y-2 p-2 " +
                         "text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
                       >
-                          <Button
+                          <Link
                             href={"/login"}
                             className={"hover:text-blue-800 text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
                           >
                               Đăng nhập
-                          </Button>
-                          <Button
+                          </Link>
+                          <Link
                             href={"/forgot-password"}
                             className={"hover:text-blue-800 text-xs sm:text-sm md:text-base text-zinc-500 text-center"}
                           >
                               Quên mật khẩu?
-                          </Button>
+                          </Link>
                       </div>
                   </div>
               </div>

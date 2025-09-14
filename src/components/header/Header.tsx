@@ -21,7 +21,7 @@ export default function Header() {
     return (
         <header
             className={
-                "fixed min-w-screen top-0 z-50"
+                "fixed min-w-screen top-0 z-50 "
             }
         >
             <div className="flex items-top md:px-12 text-nowrap text-ellipsis">
@@ -29,7 +29,7 @@ export default function Header() {
                 <nav
                     className={
                         "flex-4 flex items-center justify-end gap-4 " +
-                        "px-4 w-full h-12 rounded-bl-lg md:rounded-bl-4xl " +
+                        "px-4 w-full h-12 md:rounded-bl-4xl " +
                         "bg-gradient-to-r from-teal-500 to-teal-700 "
                     }
                 >
@@ -37,7 +37,7 @@ export default function Header() {
                         <NavItem
                             key={link.item.href}
                             className={
-                                "px-4 py-1.5 shadow-sm rounded-lg " +
+                                "px-4 py-1.5 shadow border-teal-300 rounded-sm " +
                                 "text-base font-medium text-zinc-200 hover:text-zinc-600 " +
                                 "bg-teal-600 hover:bg-teal-500 " +
                                 "hover:scale-[1.1] transition duration-200"
@@ -51,12 +51,14 @@ export default function Header() {
                 <div
                     className={
                         "flex-3 flex items-center " +
-                        "w-full h-12 md:h-16 md:rounded-b-xl " +
-                        "bg-teal-700 shadow-lg "
+                        "w-full h-12 " +
+                        "bg-gradient-to-r from-teal-100 to-teal-500 "
                     }
                 >
                     <NavItem
-                        className={"mx-auto text-2xl font-semibold text-zinc-200  " +
+                        className={"mx-auto px-4 py-1.5 shadow-sm rounded-lg md:rounded-none md:shadow-none " +
+                            "bg-teal-600 hover:bg-teal-500 md:bg-transparent md:hover:bg-transparent " +
+                            "text-2xl font-semibold text-zinc-200  " +
                             "hover:scale-[1.1] transition duration-200"}
                         item={{
                             href: "/",

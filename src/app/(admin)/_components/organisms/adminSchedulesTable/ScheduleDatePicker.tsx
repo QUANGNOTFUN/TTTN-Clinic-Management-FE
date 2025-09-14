@@ -3,7 +3,7 @@ import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {StepBackIcon, StepForwardIcon} from "lucide-react";
-import {stepWeekDates} from "@/libs/function/stepWeekDates";
+import {stepWeekDates} from "@/lib/function/stepWeekDates";
 
 export type ScheduleDatePickerProps = {
 	currentDate: Date;

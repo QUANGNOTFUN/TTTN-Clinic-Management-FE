@@ -1,5 +1,5 @@
 import '../globals.css';
-import Providers from "../../../providers";
+import RootProvider from "../../components/wrapper/RootProvider";
 import React from "react";
 import Header from "@/components/header/Header";
 import {ToastContainer} from "react-toastify";
@@ -10,7 +10,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <Providers>
+        <RootProvider>
             <Header />
             <ToastContainer
               position={"top-right"}
@@ -25,6 +25,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               theme={"light"}
             />
             { children }
-        </Providers>
+        </RootProvider>
     );
 }
