@@ -12,7 +12,7 @@ import {
 } from "lucide-react"
 import {Card, CardContent, CardFooter, CardHeader} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import {useGetPatient} from "@/lib/hooks/patients/useGetPatient";
+import {useFindOnePatient} from "@/lib/hooks/patients/useFindOnePatient";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {getAccountAge} from "@/app/(user)/_component/organisms/sidebar/sidebarDesktop";
 
@@ -24,7 +24,7 @@ const navItems = [
 
 export default function SidebarMobile() {
 	const pathname = usePathname()
-	const { loading, patient, error } = useGetPatient()
+	const { loading, patient, error } = useFindOnePatient()
 	
 	const [isOpen, setIsOpen] = useState(false)
 	

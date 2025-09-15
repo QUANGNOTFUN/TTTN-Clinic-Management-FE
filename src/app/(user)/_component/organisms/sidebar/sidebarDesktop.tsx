@@ -2,7 +2,7 @@ import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { Bell, Calendar, Contact, LogOut } from "lucide-react"
 import { signOut } from "next-auth/react"
-import { useGetPatient } from "@/lib/hooks/patients/useGetPatient"
+import { useFindOnePatient } from "@/lib/hooks/patients/useFindOnePatient"
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -30,7 +30,7 @@ export function getAccountAge(createdAt?: string) {
 
 export default function SidebarDesktop() {
 	const pathname = usePathname()
-	const { loading, patient, error } = useGetPatient()
+	const { loading, patient, error } = useFindOnePatient()
 	
 	if (loading || error) return null
 

@@ -8,10 +8,15 @@ import {CustomSession} from "@/types/login";
 export function useCreateAppointmentRequest() {
 	const session = useSession() as { data: CustomSession | null };
 	
-	const mutation = useMutation({
+	return  useMutation({
+		mutationKey: ["createAppointmentRequest"],
 		mutationFn: async (data: CreateAppointmentRequestDto) => {
 			const token = session.data?.user.accessToken;
-			
+
+			if (!session.data?.user) {
+				throw new Error("User must be authenticated");
+			}
+
 			const res = await axios.post(
 				CREATE_APPOINTMENT_REQUEST,
 				data,
@@ -25,10 +30,4 @@ export function useCreateAppointmentRequest() {
 		},
 	});
 	
-	return {
-		create: mutation.mutateAsync,
-		data: mutation.data,
-		loading: mutation.isPending,
-		error: mutation.error,
-	};
 }

@@ -2,6 +2,12 @@ import React from "react";
 import Header from "@/components/header/Header";
 import SidebarProfile from "@/app/(user)/_component/organisms/sidebar/sidebarProfile";
 import {Sticky} from "@/components/sticky/Sticky";
+import {Metadata} from "next";
+
+export const metadata: Metadata = {
+    title: "Trang Chủ - Y Tế Thông Minh",
+    description: "Khám phá các dịch vụ y tế chất lượng cao, đặt lịch dễ dàng.",
+};
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {
     return (

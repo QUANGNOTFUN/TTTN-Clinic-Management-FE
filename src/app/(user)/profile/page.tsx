@@ -1,11 +1,11 @@
 "use client";
 
-import { useGetPatient } from "@/lib/hooks/patients/useGetPatient";
+import { useFindOnePatient } from "@/lib/hooks/patients/useFindOnePatient";
 import { VscLoading } from "react-icons/vsc";
 import Image from "next/image";
 
 export default function ProfilePage() {
-    const { patient, loading, error } = useGetPatient();
+    const { patient, loading, error } = useFindOnePatient();
     
     if (loading) {
         return (

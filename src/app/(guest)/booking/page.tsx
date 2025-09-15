@@ -11,12 +11,12 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import {VscLoading} from "react-icons/vsc";
 import {AppointmentFormCard} from "./_components/organism/AppointmentFormCard";
-import {useGetPatient} from "@/lib/hooks/patients/useGetPatient";
+import {useFindOnePatient} from "@/lib/hooks/patients/useFindOnePatient";
 
 export default function BookingPage() {
     const { data, loading } = useFindAllClinicServices();
     const [isSelected, setSelected] = useState<string | null>(null);
-    const { patient } = useGetPatient()
+    const { data: patient } = useFindOnePatient()
     
     useEffect(() => {
         if (data && data.length > 0 && !isSelected) {
@@ -40,12 +40,15 @@ export default function BookingPage() {
     }
     
     return (
-        <div className="flex flex-col md:flex-row min-h-screen pt-16 p-6 gap-6">
+        <div
+            className="flex flex-col md:flex-row min-h-screen pt-16 md:pt-20 p-4 gap-3
+                bg-gradient-to-br from-slate-500 to-gray-200"
+        >
             {/* Left - Main Selected */}
             <div className="w-full md:w-2/5 lg:w-1/3 flex flex-col items-center justify-center">
                 {isSelected && (
                     <ClinicServicesCard
-                        className="w-[70%] h-[10vh] md:h-[80vh] max-h-[800px]"
+                        className="w-[80%] h-[6vh] md:h-[80vh] max-h-[800px]"
                         url_image={"https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-39f4-61fa-a38d-f1f082280c0d/raw?se=2025-09-03T22%3A16%3A15Z&sp=r&sv=2024-08-04&sr=b&scid=b5071798-c451-5704-8159-8598392bb00e&skoid=cb94e22a-e3df-4e6a-9e17-1696f40fa435&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-09-03T19%3A16%3A31Z&ske=2025-09-04T19%3A16%3A31Z&sks=b&skv=2024-08-04&sig=7Niu/%2Bl4b0YDL11R/SkSX7%2B/QZWlZfZNzfJFpNlI/7I%3D"}
                         item={data.find((s) => s.id === isSelected) || data[0]}
                         isSelected={true}
@@ -58,7 +61,7 @@ export default function BookingPage() {
                 {/* Properties */}
                 <div className={"flex items-center justify-center"}>
                     <AppointmentFormCard
-                        className="flex[8] w-[90%] h-[70vh] max-h-[600px]"
+                        className="flex[8] w-[90%] md:h-[70vh] max-h-[600px]"
                         service={data.find((s) => s.id === isSelected) || data[0]}
                         userId={patient?.user_id}
                     />
@@ -76,9 +79,9 @@ export default function BookingPage() {
                         }}
                         pagination={{ clickable: true }}
                         breakpoints={{
-                            640: { slidesPerView: 2 }, // sm
-                            768: { slidesPerView: 3 }, // md
-                            1024: { slidesPerView: 4 }, // lg
+                            640: { slidesPerView: 2 },
+                            768: { slidesPerView: 3 },
+                            1024: { slidesPerView: 4 },
                         }}
                         className="w-full max-w-4xl px-12"
                     >
@@ -93,7 +96,7 @@ export default function BookingPage() {
                                         transition={{ type: "spring", stiffness: 100 }}
                                         onClick={() => setSelected(service.id)}
                                     >
-                                        <ClinicServicesCard className="w-full h-25 cursor-pointer" item={service} />
+                                        <ClinicServicesCard className="w-full h-15 md:h-25 cursor-pointer" item={service} />
                                     </motion.div>
                                 </SwiperSlide>
                             ))}

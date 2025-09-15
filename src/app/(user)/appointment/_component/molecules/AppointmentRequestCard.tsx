@@ -64,7 +64,7 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
             <CardHeader className="flex flex-col items-start gap-1.5">
                 {/* FullName Patient */}
                 <div className="flex items-start justify-between gap-2 w-full">
-                    <CardTitle className="truncate text-2xl font-extrabold tracking-tight text-gray-900">
+                    <CardTitle className="truncate text-2xl font-bold tracking-tight text-gray-900">
                         {appointment.full_name}
                     </CardTitle>
                     

@@ -1,0 +1,1 @@
+export const FIND_ONE_PATIENT = `${process.env.NEXT_PUBLIC_API_URL}patients/findOne`;

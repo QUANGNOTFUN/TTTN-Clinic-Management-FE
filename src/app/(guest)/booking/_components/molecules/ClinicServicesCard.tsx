@@ -15,14 +15,14 @@ export function ClinicServicesCard(props: ClinicServicesCardType) {
 		<div
 			className={`
 		        ${className}
-		        rounded-2xl
-		        bg-gradient-to-br from-slate-700 via-zinc-500 to-gray-800
+		        rounded-lg md:rounded-xl
+		        bg-gradient-to-tr from-gray-200 via-slate-400/50 to-gray-100
 		        hover:from-slate-500 hover:to-slate-600
-		        shadow-md hover:shadow-2xl
+		        shadow-sm hover:shadow-2xl
 		        transform hover:scale-105 hover:-translate-y-1
 		        transition-all duration-300 ease-out
 		        flex flex-col items-center justify-center
-		        p-5
+		        p-1 md:p-5
 		    `}
 		>
 			{/* Image Card */}
@@ -37,7 +37,7 @@ export function ClinicServicesCard(props: ClinicServicesCardType) {
 						src={url_image}
 						alt={item?.name || "Logo dịch vụ"}
 						fill
-						className={`object-cover ${isSelected ? "rounded-xl" : "rounded-full"} hidden sm:block`}
+						className={`object-cover ${isSelected && "rounded-xl"} hidden sm:block`}
 						sizes={isSelected ? "60vw" : "80px"}
 						priority={isSelected}
 					/>
@@ -48,10 +48,13 @@ export function ClinicServicesCard(props: ClinicServicesCardType) {
 			{/* Name Clinic Service */}
 			<p
 				className={`
-				  mb-4 md:mb-0
+				  
 		          text-center italic tracking-wide
-		          ${isSelected ? "font-semibold text-lg sm:text-xl md:text-2xl" : "font-medium text-sm sm:text-base md:text-lg"}
-		          text-gray-100 group-hover:text-indigo-200 transition-colors
+		          ${isSelected
+					  ? "mb-4 md:mb-0 font-bold text-lg sm:text-xl md:text-2xl tracking-wider"
+					  : "font-medium text-sm sm:text-base md:text-lg"
+				  }
+		          text-gray-800 group-hover:text-indigo-200 transition-colors
 		        `}
 			>
 				{item?.name || "Không có tên dịch vụ"}

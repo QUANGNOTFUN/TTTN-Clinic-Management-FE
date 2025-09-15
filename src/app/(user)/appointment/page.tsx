@@ -1,13 +1,15 @@
 "use client"
 
-import React from "react"
+import React, {useState} from "react"
 import { useFindAllAppointmentRequest } from "@/lib/hooks/appointment-request/useFindAllAppointmentRequest"
 import { AppointmentRequestCard } from "@/app/(user)/appointment/_component/molecules/AppointmentRequestCard"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CalendarX2 } from "lucide-react"
+import {FilterBarAppointmentRequest} from "@/app/(user)/appointment/_component/molecules/FilterBarAppointmentRequest";
 
 export default function AppointmentsPage() {
     const { data, isLoading, isError, error } = useFindAllAppointmentRequest()
+    const [statusFilter, setStatusFilter] = useState("")
     
     if (isError) {
         return (
@@ -19,9 +21,14 @@ export default function AppointmentsPage() {
     
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-6 px-4 sm:px-6 lg:px-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
+            <h1 className="text-2xl md:text-4xl italic font-bold text-gray-700 mb-8 text-center tracking-wide">
                 Danh sách lịch hẹn
             </h1>
+            
+            {/* Filter Badge */}
+            <div className="flex justify-between p-4 ">
+                <FilterBarAppointmentRequest value={statusFilter} onChange={setStatusFilter} />
+            </div>
             
             {/* Loading state với skeleton */}
             {isLoading ? (
