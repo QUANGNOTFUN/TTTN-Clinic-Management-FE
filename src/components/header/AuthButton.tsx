@@ -12,12 +12,12 @@ export function AuthButton() {
 					"inline-flex items-center justify-center " +
 					"gap-2 px-3 py-1.5 " +
 					"rounded-md " +
-					"text-sm font-medium text-gray-700 " +
-					"bg-gray-100 hover:bg-gray-200 " +
+					"text-sm font-medium text-white md:text-gray-300 md:hover:text-gray-900 " +
+					"bg-teal-400 md:bg-gray-100/50 md:hover:bg-gray-200 " +
 					"transition cursor-pointer"
 				}
 			>
-				<UserCircle className="w-5 h-5 text-gray-600" />
+				<UserCircle className="w-5 h-5" />
 			</Link>
 			
 			{/*Dropdown Menu*/}

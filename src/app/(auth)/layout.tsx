@@ -4,10 +4,6 @@ import React from "react";
 import Header from "@/components/header/Header";
 import {ToastContainer} from "react-toastify";
 
-export const metadata = {
-    title: 'Medical Service',
-};
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <RootProvider>
