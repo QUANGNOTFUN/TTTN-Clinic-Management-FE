@@ -25,14 +25,14 @@ export function getAccountAge(createdAt?: string) {
 	
 	if (diffDays === 0) return "Tạo hôm nay"
 	if (diffDays === 1) return "Tạo 1 ngày trước"
-	return `Tạo ${diffDays} ngày trước`
+	return `${diffDays} ngày`
 }
 
 export default function SidebarDesktop() {
 	const pathname = usePathname()
-	const { loading, patient, error } = useFindOnePatient()
+	const { data, isLoading, isError } = useFindOnePatient()
 	
-	if (loading || error) return null
+	if (isLoading || isError) return null
 
 	return (
 		<aside className="hidden md:flex fixed top-12 left-0 h-[calc(100vh-3rem)] w-[30vw] lg:w-[25vw] xl:w-[20vw] z-40 border-r bg-white">
@@ -42,16 +42,22 @@ export default function SidebarDesktop() {
 					<Avatar className="w-12 h-12 lg:w-14 lg:h-14 border shadow-sm">
 						<AvatarImage src="/default-avatar.png" alt="Avatar" />
 						<AvatarFallback>
-							{patient?.full_name?.charAt(0) ?? "?"}
+							{data?.full_name?.charAt(0) ?? "?"}
 						</AvatarFallback>
 					</Avatar>
 					<div>
 						<p className="text-base lg:text-lg font-semibold text-gray-900">
-							{patient?.full_name}
+							{data?.full_name}
 						</p>
-						<p className="text-xs lg:text-sm font-medium text-gray-500">
-							{getAccountAge(patient?.created_at)}
-						</p>
+						<div className="flex items-center gap-1">
+							<Avatar className={"w-8 h-8"}>
+								<AvatarImage src={"/profile/levelAccount/1day.png"} alt={"LevelAccountIcon"} />
+							</Avatar>
+							
+							<p className="text-xs lg:text-sm font-medium text-gray-500">
+								{getAccountAge(data?.created_at)}
+							</p>
+						</div>
 					
 					</div>
 				</CardHeader>

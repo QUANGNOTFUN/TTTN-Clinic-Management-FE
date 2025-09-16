@@ -1,21 +1,24 @@
 import {format} from "date-fns"
 import {Clock, Info, Phone} from "lucide-react"
-import {AppointmentRequest} from "@/types/appointment-request"
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
 import {Button} from "@/components/ui/button"
 import {useEffect, useState} from "react"
+import {useRouter} from "next/navigation"
 import {CountdownCircleTimer} from 'react-countdown-circle-timer'
+import {useCancelAppointmentRequest} from "@/lib/hooks/appointment-request/useCancelAppointmentRequest";
+import {toast} from "react-toastify";
+import {Appointment} from "@/types/appointment-request";
 
 interface AppointmentRequestCardProps {
-    appointment: AppointmentRequest
-    onConfirm?: (id: string) => void
-    onCancel?: (id: string) => void
+    appointment: Appointment
 }
 
 export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
-    const { appointment, onConfirm, onCancel } = props
+    const { appointment } = props
     const targetTime = new Date(appointment.appointment_time).getTime()
     const [timeLeft, setTimeLeft] = useState(targetTime - Date.now())
+    const totalDuration = 60 * 60;
+    const { mutateAsync: cancel, isSuccess, data, error } = useCancelAppointmentRequest()
     
     const formatDateTime = (dateString: string) => {
         try {
@@ -24,13 +27,6 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
             return dateString
         }
     }
-    
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setTimeLeft(targetTime - Date.now())
-        }, 1000)
-        return () => clearInterval(interval)
-    }, [targetTime])
     
     const statusMap: Record<string, { text: string; className: string }> = {
         PENDING: {
@@ -51,13 +47,26 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
         },
     }
     
-    const statusStyle =
-        statusMap[appointment.status] || {
-            text: appointment.status,
-            className: "bg-gray-100 text-gray-800 ring-gray-200",
+    const handleCancel = async (id: string) => {
+        await cancel(id);
+    }
+    const router = useRouter()
+
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success(data?.message ?? "Hủy lịch hẹn thành công")
         }
+        if (error) {
+            toast.error(error?.message ?? "Có lỗi xảy ra")
+        }
+    }, [data?.message, error, isSuccess, router]);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimeLeft(targetTime - Date.now())
+        }, 1000)
+        return () => clearInterval(interval)
+    }, [targetTime])
     
-    const totalDuration = 60 * 60;  // 1 hour in seconds
     return (
         <Card className="rounded-xl shadow-sm border hover:shadow-md transition-all">
             {/* Header */}
@@ -95,15 +104,15 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
                         ) : (
                         // Nếu status SUCCESS hoặc CANCELED thì hiện badge
                         <span
-                        className={`p-2 text-xs font-semibold rounded ${
-                        appointment.status === "SUCCESS"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                >
-                    {appointment.status === "SUCCESS" ? "Thành công" : "Đã hủy"}
-                </span>
-                )}
+                            className={`p-2 text-xs font-semibold rounded-md ${
+                                appointment.status === "SUCCESS"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-100 text-red-700"
+                            }`}
+                        >
+                            {appointment.status === "SUCCESS" ? "Thành công" : "Đã hủy"}
+                        </span>
+                    )}
             </div>
             
             {/*ID Appointment*/}
@@ -119,7 +128,7 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
                     <p className="text-xs uppercase font-medium text-gray-500 mb-1">
                         Số liên hệ
                     </p>
-                    <div className="flex items-center gap-2 ">
+                    <div className="flex items-center gap-2 text-sm">
                         <Phone className="h-5 w-5 text-indigo-600" />
                         <span>{appointment.phone_number}</span>
                     </div>
@@ -133,7 +142,7 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
                     <p className="text-xs uppercase font-medium text-gray-500 mb-1">
                         Thời gian lịch hẹn
                     </p>
-                    <div className="flex items-center gap-2 ">
+                    <div className="flex items-center gap-2 text-sm">
                         <Clock className="h-5 w-5 text-indigo-600" />
                         <span>{formatDateTime(appointment.appointment_time)}</span>
                     </div>
@@ -155,7 +164,7 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
                     <Button
                         size="default"
                         className={"text-sm font-medium text-white bg-red-400 hover:bg-red-600 cursor-pointer"}
-                        onClick={() => onCancel?.(appointment.id)}
+                        onClick={() => handleCancel(appointment.id)}
                     >
                         Hủy lịch
                     </Button>
