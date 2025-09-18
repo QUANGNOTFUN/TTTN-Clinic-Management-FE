@@ -10,14 +10,14 @@ export function useCancelAppointmentRequest() {
 	return useMutation({
 		mutationKey: ["cancelAppointmentRequest"],
 		mutationFn: async (id: string) => {
-			if (!session?.user) throw new Error("User must be authenticated");
+			if (!session?.access_token) throw new Error("User must be authenticated");
 			
 			const res = await axios.put(
 				CANCEL_APPOINTMENT_REQUEST(id),
 				{},
 				{
 					headers: {
-						Authorization: `Bearer ${session.user.accessToken}`,
+						Authorization: `Bearer ${session?.access_token}`,
 					},
 				}
 			);

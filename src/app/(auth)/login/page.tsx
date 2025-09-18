@@ -3,30 +3,58 @@
 import {useForm} from "react-hook-form";
 import {getErrorMessage} from "@/app/utils/common";
 import Image from 'next/image';
-import {LoginPayload} from "@/types/login";
+import {LoginPayload, Role} from "@/types/login";
 import {useLogin} from "@/lib/hooks/auth/useLogin";
-import React from "react";
+import React, {useEffect} from "react";
 import {useRouter} from "next/navigation";
-import {toast} from "react-toastify";
 import {VscLoading} from "react-icons/vsc";
 import Link from "next/link";
+import {useProfile} from "@/lib/hooks/auth/useProfile";
+import { toast } from "react-toastify";
 
 const Login = () => {
     const router = useRouter();
-    const { login, loading } = useLogin();
+    const { mutateAsync: login, isPending, isSuccess, isError, error } = useLogin();
     const { register, handleSubmit, formState: { errors } } = useForm();
+    const { data: user, isSuccess: profileSuccess, isLoading } = useProfile();
     
     const onSubmit = async (data: LoginPayload) => {
         try {
             await login(data);
-            router.push("/");
-            toast.success("Đăng nhập thành công", { toastId: "login-success" });
         } catch (err) {
             console.log(err);
         }
     };
     
-    if (loading) {
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success("Đăng nhập thành công", { toastId: "login-success" });
+        }
+        if (isError) {
+            toast.error(error?.message || "Đăng nhập thất bại", { toastId: "login-error" });
+        }
+    }, [error?.message, isError, isSuccess]);
+    
+    useEffect(() => {
+        if (profileSuccess && user) {
+            switch (user?.role) {
+                case Role.PATIENT:
+                    router.push("/")
+                    break
+                case Role.DOCTOR:
+                    router.push("/doctor/dashboard")
+                    break
+                case Role.MANAGER:
+                    router.push("/admin-dashboard")
+                    break
+                default:
+                    router.push("/login")
+            }
+        }
+    }, [profileSuccess, router, user, user?.role])
+    
+    
+    if (isPending || isLoading) {
         return (
           <div className="min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50">
               <VscLoading className="animate-spin text-black text-[50px]" />

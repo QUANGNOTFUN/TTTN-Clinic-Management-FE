@@ -18,13 +18,13 @@ export function useFindAllAppointmentRequest() {
 				FIND_ALL_APPOINTMENT_REQUEST,
 				{
 					headers: {
-						Authorization: `Bearer ${session.user.accessToken}`,
+						Authorization: `Bearer ${session?.access_token}`,
 					},
 				}
 			);
 			
 			return res.data;
 		},
-		enabled: !!session?.user,
+		enabled: !!session?.access_token,
 	});
 }
