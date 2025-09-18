@@ -24,7 +24,7 @@ const navItems = [
 
 export default function SidebarMobile() {
 	const pathname = usePathname()
-	const { loading, patient, error } = useFindOnePatient()
+	const { isLoading, data: patient, error } = useFindOnePatient()
 	
 	const [isOpen, setIsOpen] = useState(false)
 	
@@ -39,7 +39,7 @@ export default function SidebarMobile() {
 		return () => window.removeEventListener("resize", handleResize)
 	}, [])
 	
-	if (loading || error) return null;
+	if (isLoading || error) return null;
 
 	return (
 		<>
@@ -47,7 +47,7 @@ export default function SidebarMobile() {
 			<Button
 				onClick={() => setIsOpen(!isOpen)}
 				size={"icon"}
-				className="size-10 fixed md:hidden top-14 left-2  z-50 bg-white border hover:bg-gray-100"
+				className="size-10 fixed md:hidden top-15 left-1 z-50 bg-white border hover:bg-gray-100"
 			>
 				{isOpen ? (
 					<PanelLeftClose className="w-46 h-10 text-gray-700" />

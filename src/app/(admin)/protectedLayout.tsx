@@ -1,26 +1,32 @@
-"use client";
+"use client"
 
-import { ReactNode } from "react";
+import {useSession} from "next-auth/react"
+import {useRouter} from "next/navigation"
+import React, {useEffect} from "react"
+import {CustomSession, Role} from "@/types/login";
 
-const ProtectedLayout = ({ children }: { children: ReactNode }) => {
-    const {session, status} = useAuth();
-
-    if(status === "loading"){
-        return <div></div>
-    }
-    if(!session) {
-        return null;
-    }
-
-    return (
-        <div className='bg-gray-100  items-center justify-center'>
-            {children}
-        </div>
-    )
-}
-
-export default ProtectedLayout;
-
-function useAuth(): { session: any; status: any; } {
-    throw new Error("Function not implemented.");
+export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+    const { data, status } = useSession() as { data: CustomSession, status: string }
+    const router = useRouter()
+    
+    
+    useEffect(() => {
+        if (status === "unauthenticated") {
+            router.push("/admin-login")
+        }
+    }, [status, router])
+    
+    
+    useEffect(() => {
+        if (data?.user) {
+            const user = data?.user
+            if (
+                (user.role !== Role.MANAGER)
+            ) {
+                router.push("/admin-login");
+            }
+        }
+    }, [data?.user, router]);
+    
+    return <>{children}</>
 }

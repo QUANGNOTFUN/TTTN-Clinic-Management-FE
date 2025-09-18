@@ -1,276 +1,254 @@
-import React, {useState} from "react";
-import {ColumnDef, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
-import {Maximize2Icon, UserMinus, UserPlus} from "lucide-react";
 import {getWeekDates} from "@/lib/function/getWeekDates";
-import {ViewDoctorListCard} from "@/app/(admin)/_components/organisms/adminSchedulesTable/ViewDoctorListCard";
-import {CreateDoctorScheduleData, DoctorSchedule} from "@/types/doctorSchedule";
+import {useState} from "react";
+import {addWeeks, format, subWeeks} from "date-fns";
+import {Calendar as CalendarIcon, ChevronLeft, ChevronRight, PlusIcon} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {Calendar} from "@/components/ui/calendar";
+import {cn} from "@/lib/utils";
+import {flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
+import {Doctor} from "@/types/doctor";
+import {CreateDoctorScheduleDto, DoctorSchedule, Shift} from "@/types/doctor-schedule";
+import {vi} from 'date-fns/locale';
+import {CreateScheduleForm} from "@/app/(admin)/schedule-manage/_components/createScheduleForm/CreateScheduleForm";
 
-export interface AdminSchedulesTableProps {
-	selectedDate?: Date;
-	onCreateButton: (isOpen: boolean, createData: CreateDoctorScheduleData) => void;
-	initialItems?: DoctorSchedule[];
-	editSchedule: {
-		onDeleteButton?: (id: DoctorSchedule["id"]) => void;
-	}
+interface AdminScheduleTableProps {
+  doctors: Doctor[];
+  schedules: DoctorSchedule[];
+  selectedDate: Date;
+  onDateChange: (date: Date) => void;
+  onAddSchedule: (payload: CreateDoctorScheduleDto) => void;
+  onRemoveSchedule: (scheduleId: string) => void;
 }
 
-type HeaderScheduleTableProps = {
-	key: string;
-	name: string;
-	date?: Date;
-	shiftDuration?: { start: string; end: string };
-};
+const shifts = [
+  { id: "MORNING", label: "Sáng (8:00 - 12:00)" },
+  { id: "AFTERNOON", label: "Chiều (13:00 - 17:00)" },
+  { id: "EVENING", label: "Tối (18:00 - 21:00)" },
+];
 
-type ScheduleItem = {
-	shiftKey: string;
-	doctors: { [key: string]: DoctorSchedule[] | null };
-};
-
-type StatusButton = {
-	status: "view" | "delete"
-};
-
-export default function AdminSchedulesTable(
-	props: AdminSchedulesTableProps
-) {
-	const { selectedDate, onCreateButton, initialItems, editSchedule } = props;
-	const [isStatus, setIsStatus] = useState<StatusButton["status"]>('view');
-	const dates = getWeekDates(selectedDate || new Date());
-	
-	const headers: HeaderScheduleTableProps[] = [
-		{ key: "MONDAY", name: "Thứ 2", date: dates[0] },
-		{ key: "TUESDAY", name: "Thứ 3", date: dates[1] },
-		{ key: "WEDNESDAY", name: "Thứ 4", date: dates[2] },
-		{ key: "THURSDAY", name: "Thứ 5", date: dates[3] },
-		{ key: "FRIDAY", name: "Thứ 6", date: dates[4] },
-		{ key: "SATURDAY", name: "Thứ 7", date: dates[5] },
-		{ key: "SUNDAY", name: "Chủ nhật", date: dates[6] },
-	];
-	const shifts: HeaderScheduleTableProps[] = [
-		{ key: "MORNING", name: "Sáng", shiftDuration: { start: "08:00", end: "12:00" } },
-		{ key: "AFTERNOON", name: "Chiều", shiftDuration: { start: "13:00", end: "17:00" } },
-		{ key: "OVERTIME", name: "Ngoài giờ", shiftDuration: { start: "18:00", end: "22:00" } },
-	];
-	
-	// Khởi tạo state cho dữ liệu bảng
-	const [scheduleData, setScheduleData] = useState<ScheduleItem[]>(() => {
-		return shifts.map((shift) => ({
-			shiftKey: shift.key,
-			doctors: headers.reduce((acc, header) => {
-				const items = initialItems?.filter(
-					(item) => item.shift === shift.key && item.day === header.key
-				);
-				acc[header.key] = items
-					?.filter((item) => item !== null) || [];
-				return acc;
-			}, {} as { [key: string]: DoctorSchedule[] | null }),
-		}));
-	});
-	// View detail
-	const [isViewOpen, setIsViewOpen] = useState(false);
-	const [selectedDoctors, setSelectedDoctors] = useState<DoctorSchedule[]>([]);
-	const [selectedDateItem, setSelectedDateItem] = useState<string>();
-	
-	// Định nghĩa các cột
-	const columns: ColumnDef<ScheduleItem, unknown>[] = [
-		{
-			header: "Ca làm",
-			accessorKey: "shiftKey",
-			cell: (info) => {
-				const shift = shifts.find((s) => s.key === info.getValue());
-				return (
-					<div className="w-full md:min-w-32 flex flex-col items-center">
-						<span>{shift?.name}</span>
-						<span className="text-gray-600">
-              {shift?.shiftDuration?.start} - {shift?.shiftDuration?.end}
-            </span>
-					</div>
-				);
-			},
-		},
-		...headers.map((header) => ({
-			header: () => (
-				<div className={"flex flex-col items-center"}>
-					<span>{header.name}</span>
-					<span className={"text-gray-600"}>{header.date.toLocaleDateString()}</span>
-				</div>
-			),
-			accessorKey: header.key,
-			cell: (info) => {
-				const row = info.row.original;
-				const doctors = row.doctors[info.column.id] || [];
-				return (
-					<div className={"h-full w-full md:min-w-32 flex flex-col"}>
-						{/* BUTTON */}
-						<div className={"flex justify-center w-full p-1 gap-3 border-b border-gray-300"}>
-							{/* ADD BUTTON */}
-							<button
-                onClick={onCreateButton ? () => handleAddDoctor(
-                    header.date.toISOString(),
-                    row.shiftKey,
-                    header.key as CreateDoctorScheduleData['day']
-                ) : undefined}
-								className={"p-1.5 bg-zinc-100 hover:bg-green-300 rounded-md shadow-sm cursor-pointer"}
-							>
-								<UserPlus size={16} />
-							</button>
-							{/* REMOVE BUTTON */}
-							<button
-								onClick={() => {
-									handleRemoveDoctor(row.shiftKey, header.key)
-									setIsStatus('delete')
-									setSelectedDateItem(() => header.date.toLocaleDateString())
-									setSelectedDoctors(doctors)
-									setIsViewOpen(true)
-								}}
-								className={"p-1.5 bg-zinc-100 hover:bg-red-300 rounded-md shadow-sm cursor-pointer"}
-							>
-								<UserMinus size={16} />
-							</button>
-							{/* VIEW DETAIL BUTTON */}
-							{doctors.length > 5 && (
-								<button
-									onClick={() => {
-										setSelectedDateItem(() => header.date.toLocaleDateString())
-										setSelectedDoctors(doctors)
-										setIsViewOpen(true)
-									}}
-									className={"p-1.5 bg-zinc-100 hover:bg-violet-300 rounded-md shadow-sm cursor-pointer"}
-								>
-									<Maximize2Icon size={16} />
-								</button>
-							)}
-						</div>
-						{/* CARD */}
-						<div className={
-							(doctors.length > 4 ? "max-h-60 h-full p-1.5 overflow-y-auto " : "")
-						}>
-							{doctors.length > 0 ? (
-								doctors.map((doctor, index) => (
-									<div
-										key={index}
-										className={"w-full p-1 bg-white border border-gray-300 rounded-md shadow-sm mt-2 truncate text-center max-h-24"}
-									>
-										{doctor.doctor.user.full_name}
-									</div>
-								))
-							) : (
-								<div
-									className={"w-full p-1 bg-zinc-200/70 border border-gray-300 rounded-md shadow-sm mt-2 text-zinc-500 text-center max-h-24"}>
-									{"No Doctor"}
-								</div>
-							)}
-						</div>
-						
-					</div>
-				);
-			},
-		})),
-	];
-	
-	// Cấu hình bảng
-	const table = useReactTable({
-		data: scheduleData,
-		columns,
-		getCoreRowModel: getCoreRowModel(),
-	});
-	
-	// Hàm thêm bác sĩ
-	const handleAddDoctor = (
-		date: string,
-		shiftKey: CreateDoctorScheduleData['shift'],
-		dayKey: CreateDoctorScheduleData['day']
-	) => {
-		const createData: CreateDoctorScheduleData = {
-			doctor_id: null,
-			shift: shiftKey,
-			day: dayKey,
-			is_available: true,
-			date: date,
-			week_count: 0,
-		}
-		onCreateButton(true, createData);
-	};
-	
-	// Hàm xóa bác sĩ (xóa doctor cuối cùng)
-	const handleRemoveDoctor = (shiftKey: string, dayKey: string) => {
-		setScheduleData((prev) =>
-			prev.map((item) =>
-				item.shiftKey === shiftKey
-					? {
-						...item,
-						doctor: {
-							...item.doctors[dayKey],
-							[dayKey]: item.doctors[dayKey]?.length
-								? item.doctors[dayKey].slice(0, -1)
-								: null,
-						},
-					}
-					: item
-			)
-		);
-	};
-	
-	// Hàm xử lý khi đóng ViewDoctorListCard
-	const handleCloseView = () => {
-		setIsViewOpen(false);
-		setSelectedDoctors([]);
-	};
-	
-	return (
-		<div className="container mx-auto overflow-auto dark:outline dark:outline-white shadow-lg rounded-xl">
-			<table
-				className={
-					"container table-auto border-collapse min-w-full rounded-lg shadow-md " +
-					"text-xs md:text-sm lg:text-base font-medium text-zinc-950 dark:text-gray-200"
-				}
-			>
-				<thead className="bg-violet-300 text-gray-900 dark:bg-gray-900 dark:text-gray-300">
-				{table.getHeaderGroups().map((headerGroup) => (
-					<tr key={headerGroup.id}>
-						{headerGroup.headers.map((header) => (
-							<th
-								key={header.id}
-								className="border border-violet-200 py-3 px-2 text-center"
-							>
-								{flexRender(header.column.columnDef.header, header.getContext())}
-							</th>
-						))}
-					</tr>
-				))}
-				</thead>
-				<tbody>
-				{table.getRowModel().rows.map((row) => (
-					<tr
-						key={row.id}
-						className={"bg-white hover:bg-violet-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200"}
-					>
-						{row.getVisibleCells().map((cell) => (
-							<td
-								key={cell.id}
-								className={"h-24 md:h-28 py-2 px-1 border border-gray-300 text-center text-xs md:text-base"}
-							>
-								{flexRender(cell.column.columnDef.cell, cell.getContext())}
-							</td>
-						))}
-					</tr>
-				))}
-				</tbody>
-			</table>
-			{isViewOpen && (
-				<ViewDoctorListCard
-					label={`Danh sách bác sĩ (${selectedDateItem})`}
-					schedules={selectedDoctors}
-					editSchedule={{
-						status: isStatus,
-						onDelete: (id) => {
-							editSchedule.onDeleteButton(id)
-							setIsStatus('view')
-						}
-					}}
-					onClose={handleCloseView}
-				/>
-			)}
-		</div>
-	);
+export function AdminScheduleTable(props: AdminScheduleTableProps) {
+  const { doctors, schedules, selectedDate, onDateChange, onAddSchedule, onRemoveSchedule } = props;
+  const [selectedDoctor, setSelectedDoctor] = useState<string>("");
+  const weekDates = getWeekDates(selectedDate);
+  const weekRange = `${format(weekDates[0], 'dd/MM/yyyy')} - ${format(weekDates[6], 'dd/MM/yyyy')}`;
+  // Init creates a schedule form
+  const [isCreating, setIsCreating] = useState<boolean>(false);
+  const [selectedDateCreate, setSelectedDateCreate] = useState<Date>(selectedDate);
+  const [selectedShiftCreate, setSelectedShiftCreate] = useState<Shift>();
+  
+  // Handle button calender
+  const handlePreviousWeek = () => onDateChange(subWeeks(selectedDate, 1));
+  const handleNextWeek = () => onDateChange(addWeeks(selectedDate, 1));
+  
+  const scheduleMap = schedules?.reduce((acc, schedule) => {
+    const scheduleDate = new Date(schedule.date);
+    const formattedDate = format(scheduleDate, 'yyyy-MM-dd');
+    const key = `${schedule.shift}-${formattedDate}`;
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(schedule);
+    return acc;
+  }, {} as Record<string, DoctorSchedule[]>);
+  
+  const columns = [
+    {
+      accessorKey: "shift",
+      header: () => <div className="text-lg font-semibold text-gray-800">Ca làm việc</div>,
+      cell: ({ row }) => {
+        const shift = shifts.find((s) => s.id === row.original.shift);
+        return (
+            <div className="font-medium text-gray-700 text-base">{shift?.label}</div>
+        );
+      },
+    },
+    ...weekDates.map((date) => ({
+      id: format(date, 'yyyy-MM-dd'),
+      header: () => (
+          <div className="text-center">
+            <div className="font-semibold text-gray-800">
+              {format(date, 'EEEE', { locale: vi })}
+            </div>
+            <div className="text-sm text-gray-500">
+              {format(date, 'dd/MM/yyyy')}
+            </div>
+          </div>
+      ),
+      cell: ({ row }) => {
+        const shift = row.original.shift;
+        const dateKey = format(date, 'yyyy-MM-dd');
+        const key = `${shift}-${dateKey}`;
+        const currentSchedules = scheduleMap[key] || [];
+        
+        return (
+            <div className="min-h-[120px] p-3 bg-gray-50 rounded-lg shadow-sm transition-all duration-200 hover:bg-gray-100">
+              <div className="flex justify-end gap-2 mb-3">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedShiftCreate(shift as Shift);
+                      setSelectedDateCreate(date);
+                      setIsCreating(true);
+                    }}
+                    className={cn(
+                        "bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 disabled:text-gray-500",
+                        "transition-all duration-200 font-medium rounded-full w-8 h-8 flex items-center justify-center cursor-pointer"
+                    )}
+                >
+                  <PlusIcon className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {currentSchedules.map((schedule) => (
+                    <div
+                        key={schedule.id}
+                        className="flex items-center justify-between p-2 text-sm bg-white rounded-md shadow-sm hover:shadow-md transition-shadow duration-200"
+                    >
+                  <span className="truncate font-medium text-gray-700">
+                    {doctors.find((d) => d.user_id === schedule.doctor_id)?.full_name}
+                  </span>
+                      <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onRemoveSchedule(schedule.id)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full w-6 h-6 flex items-center justify-center"
+                      >
+                        ×
+                      </Button>
+                    </div>
+                ))}
+              </div>
+            </div>
+        );
+      },
+    })),
+  ];
+  
+  const data = shifts.map((shift) => ({
+    shift: shift.id as Shift,
+  }));
+  
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+  
+  if (isCreating) {
+    return (
+        <CreateScheduleForm
+            doctors={doctors}
+            defaultDate={selectedDateCreate.toISOString()}
+            defaultShift={selectedShiftCreate}
+            onCreateSchedule={onAddSchedule}
+        />
+    );
+  }
+  
+  return (
+      <div className="space-y-6 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl">
+        <div className="flex items-center gap-4 flex-wrap">
+          {/* Date Selection */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                  variant="outline"
+                  className={cn(
+                      "w-[280px] justify-start text-left font-medium text-gray-700 bg-white shadow-sm hover:bg-gray-50",
+                      !selectedDate && "text-gray-400",
+                      "rounded-lg transition-all duration-200 border-gray-200"
+                  )}
+              >
+                <CalendarIcon className="mr-2 h-5 w-5 text-blue-500" />
+                <span className="text-base">{weekRange}</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 bg-white rounded-lg shadow-xl">
+              <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => date && onDateChange(date)}
+                  className="bg-white rounded-lg"
+              />
+            </PopoverContent>
+          </Popover>
+          
+          {/* Week Navigation */}
+          <div className="flex items-center gap-2">
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={handlePreviousWeek}
+                className="bg-white text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-full w-10 h-10 shadow-sm transition-all duration-200"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={handleNextWeek}
+                className="bg-white text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-full w-10 h-10 shadow-sm transition-all duration-200"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
+          
+          {/* Doctor Selection */}
+          <Select value={selectedDoctor} onValueChange={setSelectedDoctor}>
+            <SelectTrigger className="w-[220px] bg-white text-gray-700 font-medium rounded-lg shadow-sm border-gray-200 hover:bg-gray-50 transition-all duration-200">
+              <SelectValue placeholder="Chọn bác sĩ" />
+            </SelectTrigger>
+            <SelectContent className="bg-white rounded-lg shadow-xl max-h-60 overflow-y-auto">
+              {doctors.map((doctor) => (
+                  <SelectItem
+                      key={doctor.user_id}
+                      value={doctor.user_id}
+                      className="text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-150"
+                  >
+                    {doctor?.full_name || "Chưa cập nhật tên"}
+                  </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        {/* Schedule Table */}
+        <div className="rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden">
+          <Table className="w-full table-auto [&_td]:border [&_th]:border border-collapse text-center">
+            <TableHeader className="bg-blue-50">
+              {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id} className="hover:bg-blue-100 transition-all duration-200">
+                    {headerGroup.headers.map((header) => (
+                        <TableHead
+                            key={header.id}
+                            className="text-center text-gray-800 font-semibold text-base py-4"
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                    ))}
+                  </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.map((row) => (
+                  <TableRow
+                      key={row.id}
+                      className="hover:bg-gray-50 transition-all duration-200"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="py-3">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                    ))}
+                  </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+  );
 }

@@ -15,7 +15,13 @@ export type ClientFilterOptions<T, M> = {
 	pagination?: Pagination
 }
 
-export function useClientFilter<T, M>(props: ClientFilterOptions<T, M>) {
+export function useClientFilter<T, M>(props: ClientFilterOptions<T, M>, p0: {
+	filterField: string;
+	filtersType: "ACTIVE" | "INACTIVE";
+	sortField: string;
+	sortOrder: string;
+	pagination: { page: number; pageSize: number }
+}) {
 	const {
 		data,
 		filterField,

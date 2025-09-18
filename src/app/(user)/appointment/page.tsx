@@ -51,12 +51,12 @@ export default function AppointmentsPage() {
     }
     
     if (data && data.length === 0) {
-        return(
-            <div className="flex flex-col items-center justify-center text-gray-500 mt-12">
+        return (
+            <div className="flex flex-col w-full h-screen items-center justify-center text-gray-500">
                 <CalendarX2 className="h-12 w-12 mb-3 text-gray-400" />
                 <p className="text-lg font-medium">Không có lịch hẹn nào</p>
             </div>
-        )
+        );
     }
     
     return (

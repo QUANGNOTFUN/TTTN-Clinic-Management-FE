@@ -5,12 +5,17 @@ export type LoginPayload = {
 	password: string;
 }
 
+export enum Role {
+	MANAGER = 'MANAGER',
+	DOCTOR = 'DOCTOR',
+	PATIENT = 'PATIENT',
+}
 
 export interface CustomSession extends Session {
+	access_token?: string;
 	user: {
-		name?: string | null;
+		id?: string;
 		email?: string | null;
-		image?: string | null;
-		accessToken?: string;
+		role?: string | null;
 	};
 }
