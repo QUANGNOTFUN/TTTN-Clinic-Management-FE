@@ -1,31 +1,45 @@
 "use client";
 
-import TableDropdownActions, {DropdownItem} from "@/app/(admin)/_components/organisms/adminManagerTable/TableDropdownActions";
-import * as Icons from "lucide-react";
-import {CircleEllipsis} from "lucide-react";
+import {useFindAllDoctors} from "@/lib/hooks/doctors/useFindAllDoctors";
+import {useFindAllPatients} from "@/lib/hooks/patients/useFindAllPatients";
+import {useFindAllClinicServices} from "@/lib/hooks/clinic-services/useFindAllClinicServices";
+import {useFindAllAppointmentRequestByDate} from "@/lib/hooks/appointment-request/useFindAllAppointmentRequestByDate";
+import {StatsCardsSection} from "@/app/(admin)/admin-dashboard/_component/statsCardsSection/StatsCardsSection";
+import {useState} from "react";
+import {
+    AppointmentRequestSection
+} from "@/app/(admin)/admin-dashboard/_component/AppointmentReqSection/AppointmentRequestSection";
+import {
+    StatsCardsSectionSkeleton
+} from "@/app/(admin)/admin-dashboard/_component/statsCardsSection/StatsCardsSectionSkeleton";
+import {
+    AppointmentRequestSectionSkeleton
+} from "@/app/(admin)/admin-dashboard/_component/AppointmentReqSection/AppointmentRequestSectionSkeleton"; // Icons
 
-
-export default function ManagementPage() {
-    const items: DropdownItem[] = [
-        {
-            icon: Icons.Settings,
-            label: "Settings",
-            onClick: () => console.log("Settings clicked"),
-        },
-        {
-            icon: Icons.ChevronDown,
-            label: "ChevronDown",
-            onClick: () => console.log("ChevronDown clicked"),
-        },
-    ];
-
-    return (
-        <div className="p-4">
-            <div className="flex justify-end mb-4">
-                <TableDropdownActions icon={CircleEllipsis} items={items} />
+export default function AdminDashBoardPage() {
+    const { data: doctors } = useFindAllDoctors();
+    const { data: patients } = useFindAllPatients();
+    const { data: services } = useFindAllClinicServices();
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const { data: appointmentRequest } = useFindAllAppointmentRequestByDate(selectedDate);
+    
+    if (!doctors || !patients || !services || !appointmentRequest) {
+        return(
+            <div className={"flex-1 flex flex-col w-full p-6 space-y-8"}>
+                <StatsCardsSectionSkeleton />
+                <AppointmentRequestSectionSkeleton />
             </div>
-            <h1 className="text-2xl font-bold">Management Dashboard</h1>
-            {/* Nội dung trang */}
+        );
+    }
+    
+    return (
+        <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+            <div className="flex-1 flex flex-col w-full">
+                <main className="p-6 space-y-8">
+                    <StatsCardsSection doctors={doctors} patients={patients} services={services} appointmentRequest={appointmentRequest} />
+                    <AppointmentRequestSection services={services} appointmentRequest={appointmentRequest} />
+                </main>
+            </div>
         </div>
     );
 }

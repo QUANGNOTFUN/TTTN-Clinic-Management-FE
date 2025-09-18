@@ -1,99 +1,123 @@
-'use client'
-import AdminScheduleLayout from "@/app/(admin)/_components/organisms/adminSchedulesTable/AdminScheduleLayout";
-import {useGetDoctors} from "@/lib/hooks/doctors/useGetDoctors";
-import {CreateDoctorScheduleData, DoctorSchedule, WeekDateInput} from "@/types/doctorSchedule";
-import {useCallback, useState} from "react";
-import AdminForm from "@/app/(admin)/_components/organisms/create&UpdateForm/AdminForm";
-import {CREATE_DOCTOR_SCHEDULE_INPUT} from "@/app/(admin)/schedule-manage/constant";
-import {useCreateDoctorSchedule} from "@/libs/hooks/doctorSchedules/useCreateDoctorSchedule";
-import {toast} from "react-toastify";
-import {useGetDoctorSchedulesByWeekDate} from "@/libs/hooks/doctorSchedules/useGetDoctorSchedulesByWeekDate";
-import {getWeekDates} from "@/lib/function/getWeekDates";
-import {useDeleteDoctorSchedule} from "@/libs/hooks/doctorSchedules/useDeleteDoctorSchedule";
+"use client";
 
-export default function AdminSchedulePage() {
-	// INIT for data
-	const { doctors } = useGetDoctors()
-	const [selectedDate, setSelectedDate] = useState<Date>(new Date())
-	const [weekDateInput, setWeekDateInput] = useState<WeekDateInput>(
-		{
-			start_week: getWeekDates()[0].toISOString(),
-			end_week: getWeekDates()[6].toISOString(),
+import {AdminScheduleTable} from "@/app/(admin)/schedule-manage/_components/adminSchedulesTable/AdminSchedulesTable";
+import React, {useState} from "react";
+import {useFindAllDoctors} from "@/lib/hooks/doctors/useFindAllDoctors";
+import {useFindAllScheduleByWeek} from "@/lib/hooks/doctor-shedules/useFindAllScheduleByWeek";
+import {useCreateDoctorSchedule} from "@/lib/hooks/doctor-shedules/useCreateDoctorSchedule";
+import {VscLoading} from "react-icons/vsc";
+import {
+	CreateDoctorScheduleDto,
+	CreateScheduleForm,
+} from "@/app/(admin)/schedule-manage/_components/createScheduleForm/CreateScheduleForm";
+import {useFindOneScheduleByWeek} from "@/lib/hooks/doctor-shedules/useFindOneScheduleByWeek";
+import {useDeleteDoctorSchedule} from "@/lib/hooks/doctor-shedules/useDeleteDoctorSchedule";
+import {DeleteDialogGeneric} from "@/app/(admin)/schedule-manage/_components/deleteScheduleDialog/DeleteDialogGeneric";
+import {DoctorSchedule} from "@/types/doctor-schedule";
+
+export default function ScheduleManagePage() {
+	const [selectedDate, setSelectedDate] = useState(new Date());
+	const [selectedDoctor, setSelectedDoctor] = useState<string>("");
+	const [selectedSchedule, setSelectedSchedule] = useState<string>("");
+	const {
+		data: doctors = [],
+		isLoading: doctorLoading,
+		isFetching: doctorFetching,
+	} = useFindAllDoctors();
+	const {
+		data: schedulesFindAll = [],
+		isLoading: scheduleFindAllLoading,
+		isFetching: scheduleFindAllFetching,
+		refetch: refreshFindAll,
+	} = useFindAllScheduleByWeek(selectedDate);
+	const {
+		data: schedulesFindOne = [],
+		isLoading: scheduleFindOneLoading,
+		isFetching: scheduleFindOneFetching,
+		refetch: refreshFindOne,
+	} = useFindOneScheduleByWeek(selectedDoctor, selectedDate);
+	const { mutateAsync: create, isPending: createPending } = useCreateDoctorSchedule();
+	const { mutateAsync: deleteSchedule, isPending: deletePending } = useDeleteDoctorSchedule();
+	
+	// Init creates a schedule form
+	const [isCreating, setIsCreating] = useState<boolean>(false);
+	const [selectedDataCreate, setSelectedDataCreate] = useState<CreateDoctorScheduleDto>();
+	// Init deletes a schedule
+	const [isDeleting, setIsDeleting] = useState<boolean>(false);
+	const scheduleDelete = schedulesFindAll.find((schedule) => schedule.id === selectedSchedule);
+	
+	const handleAddSchedule = async (payload: CreateDoctorScheduleDto) => {
+		try {
+			await create(payload);
+			setIsCreating(false);
+			setSelectedDoctor("");
+			setSelectedDataCreate(undefined);
+		} catch (error) {
+			console.error("Error creating schedule:", error);
 		}
-	)
-	const { data: schedules, loading: getLoading, error, refetch } = useGetDoctorSchedulesByWeekDate(weekDateInput)
-	const { create: createSchedule, loading: createLoading } = useCreateDoctorSchedule()
-	const { delete: deleteSchedule, loading: deleteLoading } = useDeleteDoctorSchedule()
+	};
 	
-	// INIT for components
-	const [createScheduleData, setCreateScheduleData] = useState<CreateDoctorScheduleData | null>(null);
-	const [isCreating, setIsCreating] = useState(false);
-	const createInput = CREATE_DOCTOR_SCHEDULE_INPUT(doctors)
+	const handleRemoveSchedule = async () => {
+		await deleteSchedule(selectedSchedule);
+		await refreshFindAll();
+		await refreshFindOne();
+		setIsDeleting(false);
+	};
 	
-	const handSelectedDate = (date: Date) => {
-		setSelectedDate(date)
-		const weekDates = getWeekDates(date)
-		setWeekDateInput({
-			start_week: weekDates[0].toISOString(),
-			end_week: weekDates[6].toISOString(),
-		})
+	// Kiểm tra tất cả trạng thái loading/pending
+	const isAnyLoading =
+		doctorLoading || doctorFetching ||
+		scheduleFindAllLoading || scheduleFindAllFetching ||
+		scheduleFindOneLoading || scheduleFindOneFetching ||
+		createPending || deletePending;
+	
+	if (isAnyLoading) {
+		return (
+			<div className="min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50">
+				<VscLoading className="animate-spin text-black text-[50px]" />
+			</div>
+		);
 	}
-	
-	const handleCreateSubmit = useCallback(async (data: CreateDoctorScheduleData) => {
-		try {
-			await createSchedule(data)
-			await refetch()
-			toast.success("Tạo lịch thành công", {toastId: "create-schedule-success"} )
-		} catch (error: unknown) {
-			toast.error(`Tạo lịch thất bại: ${error instanceof Error ? error.message : String(error)}`, {toastId: "create-schedule-error"})
-		} finally {
-			setIsCreating(false)
-			setCreateScheduleData(null)
-		}
-	}, [createSchedule, refetch])
-	
-	const handleDeleteSubmit = useCallback(async (id: DoctorSchedule['id']) => {
-		try {
-			await deleteSchedule(id)
-			await refetch()
-			toast.success("Xóa lịch thành công", {toastId: "delete-schedule-success"})
-		} catch (error: unknown) {
-			toast.error(`Xóa lịch thất bại: ${error instanceof Error ? error.message : String(error)}`, {toastId: "delete-schedule-error"})
-		}
-	}, [deleteSchedule, refetch])
-	
-	if (createLoading) return <div>Loading create...</div>;
-	if (getLoading) return <div>Loading fetch ...</div>;
-	if (deleteLoading) return <div>Loading delete ...</div>;
-	if (error) return <div>Error: {error.message}</div>;
 	
 	return (
 		<>
-			{isCreating && (
-				<AdminForm
-					fields={createInput.fields}
-					submitLabel={ createInput.submitLabel }
-					title={createInput.title + " - " + new Date(createScheduleData.date).toLocaleDateString() }
-					onSubmit={(input) => handleCreateSubmit({...createScheduleData, ...input})}
+			{isCreating && !createPending && (
+				<CreateScheduleForm
+					doctors={doctors}
+					defaultDate={selectedDataCreate.date}
+					defaultShift={selectedDataCreate.shift}
+					onCreateSchedule={handleAddSchedule}
 					onClose={() => {
-						setIsCreating(false)
-						setCreateScheduleData(null)
+						setIsCreating(false);
+						setSelectedDataCreate(undefined);
 					}}
 				/>
 			)}
-			{createScheduleData?.week_count}
-			<AdminScheduleLayout
+			
+			{isDeleting && (
+				<DeleteDialogGeneric<DoctorSchedule>
+					item={scheduleDelete}
+					onAction={handleRemoveSchedule}
+					onClose={() => setIsDeleting(false)}
+					title="Xóa lịch làm việc"
+					description="Bạn có chắc chắn muốn xóa lịch làm việc này?"
+				/>
+			)}
+			
+			<AdminScheduleTable
 				doctors={doctors}
-				schedules={schedules}
-				dateProps={{
-					date: selectedDate,
-					onSelected: handSelectedDate,
+				schedules={ selectedDoctor ? schedulesFindOne : schedulesFindAll }
+				selectedDate={selectedDate}
+				onSelectedDoctor={setSelectedDoctor}
+				onDateChange={setSelectedDate}
+				onAddSchedule={(payload) => {
+					setIsCreating(true);
+					setSelectedDataCreate(payload);
 				}}
-				onCreateButton={(isOpen , createData) => {
-					setIsCreating(isOpen);
-					setCreateScheduleData(createData);
+				onRemoveSchedule={(scheduleId) => {
+					setIsDeleting(true);
+					setSelectedSchedule(scheduleId);
 				}}
-				onDeleteButton={handleDeleteSubmit}
 			/>
 		</>
 	);

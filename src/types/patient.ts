@@ -11,8 +11,11 @@ export type Patient = {
 	insurance_number?: string | null;
 	created_at?: string;
 	updated_at?: string;
+	user: {
+		email: string;
+		is_active: boolean;
+	};
 };
-
 export type PatientUpdate = {
 	full_name?: string;
 	gender?: string;

@@ -6,14 +6,14 @@ import {CREATE_APPOINTMENT_REQUEST} from "@/lib/api/appointment-request";
 import {CustomSession} from "@/types/login";
 
 export function useCreateAppointmentRequest() {
-	const session = useSession() as { data: CustomSession | null };
+	const { data: session } = useSession() as { data: CustomSession | null };
 	
 	return  useMutation({
 		mutationKey: ["createAppointmentRequest"],
 		mutationFn: async (data: CreateAppointmentRequestDto) => {
-			const token = session.data?.user.accessToken;
+			const token = session?.access_token;
 
-			if (!session.data?.user) {
+			if (!session?.access_token) {
 				throw new Error("User must be authenticated");
 			}
 

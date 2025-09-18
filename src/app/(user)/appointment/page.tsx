@@ -1,7 +1,7 @@
 "use client"
 
 import React, {useState} from "react"
-import {useFindAllAppointmentRequest} from "@/lib/hooks/appointment-request/useFindAllAppointmentRequest"
+import {useFindAllAppointmentRequestById} from "@/lib/hooks/appointment-request/useFindAllAppointmentRequestById"
 import {AppointmentRequestCard} from "@/app/(user)/appointment/_component/molecules/AppointmentRequestCard"
 import {Skeleton} from "@/components/ui/skeleton"
 import {CalendarX2} from "lucide-react"
@@ -11,21 +11,25 @@ import {
 } from "@/app/(user)/appointment/_component/molecules/AppointmentRequestFilterBadge";
 import {useClientFilter} from "@/lib/hooks/filters/useClientFilter";
 import {Appointment} from "@/types/appointment-request";
+import {useSession} from "next-auth/react";
+import {CustomSession} from "@/types/login";
 
 export default function AppointmentsPage() {
-    const { data, isLoading, isError, error } = useFindAllAppointmentRequest()
+    const { data: session } = useSession() as { data: CustomSession };
+    const { data, isLoading, isError, error } = useFindAllAppointmentRequestById(session?.user.id);
     const [statusFilter, setStatusFilter] = useState<AppointmentRequestFilterBadgeProps['status']>()
     const [sortFilter, setSortFilter] = useState<AppointmentRequestFilterBadgeProps['sort']>()
     const [currentPage, setCurrentPage] = useState<number>(1)
-    const { data: filteredData, totalPages } = useClientFilter<Appointment, AppointmentRequestFilterBadgeProps['status']>({
-        data: data || [],
-        filterField: "status",
-        allValue: 'ALL',
-        filtersType: statusFilter,
-        sortField: "created_at",
-        sortOrder: sortFilter,
-        pagination: { page: currentPage, pageSize: 12,}
-    })
+    const { data: filteredData, totalPages } =
+        useClientFilter<Appointment, AppointmentRequestFilterBadgeProps['status']>({
+            data: data || [],
+            filterField: "status",
+            allValue: "ALL",
+            filtersType: statusFilter,
+            sortField: "created_at",
+            sortOrder: sortFilter,
+            pagination: { page: currentPage, pageSize: 12 },
+        });
     
     if (isLoading) {
         return (
@@ -51,12 +55,12 @@ export default function AppointmentsPage() {
     }
     
     if (data && data.length === 0) {
-        return(
-            <div className="flex flex-col items-center justify-center text-gray-500 mt-12">
+        return (
+            <div className="flex flex-col w-full h-screen items-center justify-center text-gray-500">
                 <CalendarX2 className="h-12 w-12 mb-3 text-gray-400" />
                 <p className="text-lg font-medium">Không có lịch hẹn nào</p>
             </div>
-        )
+        );
     }
     
     return (

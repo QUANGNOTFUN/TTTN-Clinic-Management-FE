@@ -5,10 +5,17 @@ import { VscLoading } from "react-icons/vsc";
 import Image from "next/image";
 import {useSession} from "next-auth/react";
 import {CustomSession} from "@/types/login";
+import {useEffect} from "react";
 
 export default function ProfilePage() {
     const session = useSession() as { data: CustomSession };
     const { data, isLoading, isError, error } = useFindOnePatient();
+    
+    useEffect(() => {
+        if (session?.data?.user.email) {
+        
+        }
+    }, []);
     
     if (isLoading) {
         return (

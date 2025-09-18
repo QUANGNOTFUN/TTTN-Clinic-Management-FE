@@ -3,30 +3,51 @@
 import {useForm} from "react-hook-form";
 import {getErrorMessage} from "@/app/utils/common";
 import Image from 'next/image';
-import {LoginPayload} from "@/types/login";
+import {CustomSession, LoginPayload, Role} from "@/types/login";
 import {useLogin} from "@/lib/hooks/auth/useLogin";
-import React from "react";
+import React, {useEffect} from "react";
 import {useRouter} from "next/navigation";
-import {toast} from "react-toastify";
 import {VscLoading} from "react-icons/vsc";
 import Link from "next/link";
+import {toast} from "react-toastify";
+import {useSession} from "next-auth/react";
 
 const Login = () => {
     const router = useRouter();
-    const { login, loading } = useLogin();
+    const session = useSession() as { data: CustomSession };
+    const { mutateAsync: login, isPending } = useLogin();
     const { register, handleSubmit, formState: { errors } } = useForm();
     
     const onSubmit = async (data: LoginPayload) => {
         try {
             await login(data);
-            router.push("/");
-            toast.success("Đăng nhập thành công", { toastId: "login-success" });
         } catch (err) {
             console.log(err);
         }
     };
     
-    if (loading) {
+    useEffect(() => {
+        if (session.data?.user) {
+            const user = session.data.user;
+            toast.success('Đăng nhập thành công!');
+            if (user?.role === Role.MANAGER) {
+                setTimeout(() => {
+                    router.push('/admin-dashboard');
+                }, 500);
+            } else if (user?.role === Role.DOCTOR) {
+                setTimeout(() => {
+                    router.push('/doctor-dashboard');
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    router.push('/');
+                }, 500);
+            }
+        }
+    }, [router, session.data?.user]);
+    
+    
+    if (isPending) {
         return (
           <div className="min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50">
               <VscLoading className="animate-spin text-black text-[50px]" />

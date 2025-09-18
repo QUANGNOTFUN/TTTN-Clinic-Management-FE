@@ -14,7 +14,7 @@ import {AppointmentFormCard} from "./_components/organism/AppointmentFormCard";
 import {useFindOnePatient} from "@/lib/hooks/patients/useFindOnePatient";
 
 export default function BookingPage() {
-    const { data, loading } = useFindAllClinicServices();
+    const { data, isPending } = useFindAllClinicServices();
     const [isSelected, setSelected] = useState<string | null>(null);
     const { data: patient } = useFindOnePatient()
     
@@ -24,7 +24,7 @@ export default function BookingPage() {
         }
     }, [data, isSelected]);
     
-    if (loading) {
+    if (isPending) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50">
                 <VscLoading className="animate-spin text-black text-[50px]" />

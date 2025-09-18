@@ -4,7 +4,6 @@ import {useForm} from "react-hook-form";
 import {getErrorMessage} from "@/app/utils/common";
 import React, {useEffect} from "react";
 import Image from "next/image";
-import {AxiosError} from "axios";
 import {useRegister} from "@/lib/hooks/auth/useRegister";
 import {RegisterForm, RegisterPayload} from "@/types/register";
 import {useRouter} from "next/navigation";
@@ -14,9 +13,7 @@ import Link from "next/link";
 
 const Register = () => {
     const router = useRouter();
-    const {
-        mutate: mutateRegister, isPending, isError, error, isSuccess,
-    } = useRegister();
+    const { mutate: mutateRegister, isPending, isError, error, isSuccess, } = useRegister();
     
     const {
         register: formRegister, handleSubmit, formState: { errors },

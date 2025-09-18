@@ -1,9 +1,9 @@
 import React from 'react';
 import '../globals.css';
 import type {Metadata} from "next";
-import AdminClientWrapper from "@/app/(admin)/_components/organisms/adminClientWrapper/AdminClientWrapper";
 import {ToastContainer} from "react-toastify";
-import ProtectedLayout from "@/app/(admin)/protectedLayout";
+import AdminHeader from "@/app/(admin)/_components/organisms/header/AdminHeader";
+import ProtectedAdminLayout from "@/app/(admin)/protectedAdminLayout";
 
 export const metadata: Metadata = {
   title: "Quản lí phòng khám",
@@ -16,22 +16,25 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-      // <ProtectedLayout>
-      <AdminClientWrapper>
-        {children}
-        <ToastContainer
-          position={"top-right"}
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick={true}
-          rtl={false}
-          pauseOnFocusLoss={false}
-          draggable
-          pauseOnHover={false}
-          theme={"light"}
-        />
-      </AdminClientWrapper>
-      // </ProtectedLayout>
+      <ProtectedAdminLayout>
+          <div className={"min-h-screen "}>
+              <AdminHeader />
+              <main className={"pt-16 bg-gray-100 min-h-screen"}>
+                  {children}
+              </main>
+          </div>
+          <ToastContainer
+              position={"top-right"}
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick={true}
+              rtl={false}
+              pauseOnFocusLoss={false}
+              draggable
+              pauseOnHover={false}
+              theme={"light"}
+          />
+      </ProtectedAdminLayout>
   );
 }

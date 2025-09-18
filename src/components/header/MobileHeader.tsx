@@ -16,12 +16,12 @@ import {signOut, useSession} from "next-auth/react";
 import Image from "next/image";
 import {DialogTitle} from "@radix-ui/react-dialog";
 import {usePathname} from "next/navigation";
-import {useFindAllAppointmentRequest} from "@/lib/hooks/appointment-request/useFindAllAppointmentRequest";
+import {useFindAllAppointmentRequestById} from "@/lib/hooks/appointment-request/useFindAllAppointmentRequestById";
 
 export default function MobileHeader() {
 	const { data: session } = useSession();
 	const pathname = usePathname();
-	const { data: appointmentRequest } = useFindAllAppointmentRequest();
+	const { data: appointmentRequest } = useFindAllAppointmentRequestById();
 	
 	const tNavLinks = [
 		{ href: "/doctor", label: "Bác sĩ", icon: <User2Icon className="w-5 h-5" /> },

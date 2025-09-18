@@ -2,7 +2,6 @@
 
 import { useForm } from "react-hook-form";
 import React, { useState, useEffect } from "react";
-import { gql, useMutation } from "@apollo/client";
 import { enqueueSnackbar } from "notistack";
 
 const SEND_OTP_MUTATION = gql`
@@ -25,8 +24,6 @@ export default function ForgetPasswordPage() {
         reset,
     } = useForm();
 
-    const [sendOtp] = useMutation(SEND_OTP_MUTATION);
-    const [resetPassword] = useMutation(RESET_PASSWORD_MUTATION);
     const [step, setStep] = useState<"EMAIL" | "RESET">("EMAIL");
     const [countdown, setCountdown] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
