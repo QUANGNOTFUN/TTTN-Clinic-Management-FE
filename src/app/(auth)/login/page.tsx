@@ -3,20 +3,20 @@
 import {useForm} from "react-hook-form";
 import {getErrorMessage} from "@/app/utils/common";
 import Image from 'next/image';
-import {LoginPayload, Role} from "@/types/login";
+import {CustomSession, LoginPayload, Role} from "@/types/login";
 import {useLogin} from "@/lib/hooks/auth/useLogin";
 import React, {useEffect} from "react";
 import {useRouter} from "next/navigation";
 import {VscLoading} from "react-icons/vsc";
 import Link from "next/link";
-import {useProfile} from "@/lib/hooks/auth/useProfile";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
+import {useSession} from "next-auth/react";
 
 const Login = () => {
     const router = useRouter();
-    const { mutateAsync: login, isPending, isSuccess, isError, error } = useLogin();
+    const session = useSession() as { data: CustomSession };
+    const { mutateAsync: login, isPending } = useLogin();
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const { data: user, isSuccess: profileSuccess, isLoading } = useProfile();
     
     const onSubmit = async (data: LoginPayload) => {
         try {
@@ -27,34 +27,27 @@ const Login = () => {
     };
     
     useEffect(() => {
-        if (isSuccess) {
-            toast.success("Đăng nhập thành công", { toastId: "login-success" });
-        }
-        if (isError) {
-            toast.error(error?.message || "Đăng nhập thất bại", { toastId: "login-error" });
-        }
-    }, [error?.message, isError, isSuccess]);
-    
-    useEffect(() => {
-        if (profileSuccess && user) {
-            switch (user?.role) {
-                case Role.PATIENT:
-                    router.push("/")
-                    break
-                case Role.DOCTOR:
-                    router.push("/doctor/dashboard")
-                    break
-                case Role.MANAGER:
-                    router.push("/admin-dashboard")
-                    break
-                default:
-                    router.push("/login")
+        if (session.data?.user) {
+            const user = session.data.user;
+            toast.success('Đăng nhập thành công!');
+            if (user?.role === Role.MANAGER) {
+                setTimeout(() => {
+                    router.push('/admin-dashboard');
+                }, 500);
+            } else if (user?.role === Role.DOCTOR) {
+                setTimeout(() => {
+                    router.push('/doctor-dashboard');
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    router.push('/');
+                }, 500);
             }
         }
-    }, [profileSuccess, router, user, user?.role])
+    }, [router, session.data?.user]);
     
     
-    if (isPending || isLoading) {
+    if (isPending) {
         return (
           <div className="min-h-screen flex items-center justify-center bg-zinc-300 bg-opacity-50">
               <VscLoading className="animate-spin text-black text-[50px]" />

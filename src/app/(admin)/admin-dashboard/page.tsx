@@ -1,43 +1,43 @@
 "use client";
 
+import {useFindAllDoctors} from "@/lib/hooks/doctors/useFindAllDoctors";
+import {useFindAllPatients} from "@/lib/hooks/patients/useFindAllPatients";
+import {useFindAllClinicServices} from "@/lib/hooks/clinic-services/useFindAllClinicServices";
+import {useFindAllAppointmentRequestByDate} from "@/lib/hooks/appointment-request/useFindAllAppointmentRequestByDate";
+import {StatsCardsSection} from "@/app/(admin)/admin-dashboard/_component/statsCardsSection/StatsCardsSection";
+import {useState} from "react";
+import {
+    AppointmentRequestSection
+} from "@/app/(admin)/admin-dashboard/_component/AppointmentReqSection/AppointmentRequestSection";
+import {
+    StatsCardsSectionSkeleton
+} from "@/app/(admin)/admin-dashboard/_component/statsCardsSection/StatsCardsSectionSkeleton";
+import {
+    AppointmentRequestSectionSkeleton
+} from "@/app/(admin)/admin-dashboard/_component/AppointmentReqSection/AppointmentRequestSectionSkeleton"; // Icons
 
 export default function AdminDashBoardPage() {
+    const { data: doctors } = useFindAllDoctors();
+    const { data: patients } = useFindAllPatients();
+    const { data: services } = useFindAllClinicServices();
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const { data: appointmentRequest } = useFindAllAppointmentRequestByDate(selectedDate);
+    
+    if (!doctors || !patients || !services || !appointmentRequest) {
+        return(
+            <div className={"flex-1 flex flex-col w-full p-6 space-y-8"}>
+                <StatsCardsSectionSkeleton />
+                <AppointmentRequestSectionSkeleton />
+            </div>
+        );
+    }
+    
     return (
-        <div className="flex min-h-screen bg-gray-50">
-            <div className="flex-1 flex flex-col">
-                
-                {/* Dashboard Content */}
-                <main className="p-6 space-y-6">
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {/* Card thống kê */}
-                        <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center">
-                            <span className="text-sm text-gray-500">Tổng số bác sĩ</span>
-                            <span className="text-2xl font-semibold text-emerald-600">120</span>
-                        </div>
-                        <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center">
-                            <span className="text-sm text-gray-500">Tổng số bệnh nhân</span>
-                            <span className="text-2xl font-semibold text-emerald-600">540</span>
-                        </div>
-                        <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center">
-                            <span className="text-sm text-gray-500">Lịch hẹn hôm nay</span>
-                            <span className="text-2xl font-semibold text-emerald-600">34</span>
-                        </div>
-                        <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center">
-                            <span className="text-sm text-gray-500">Doanh thu tháng</span>
-                            <span className="text-2xl font-semibold text-emerald-600">75M</span>
-                        </div>
-                    </div>
-                    
-                    {/* Ví dụ bảng hoặc chart */}
-                    <div className="bg-white rounded-xl shadow p-6">
-                        <h2 className="text-lg font-semibold mb-4">Hoạt động gần đây</h2>
-                        <ul className="space-y-3 text-gray-600">
-                            <li>Bệnh nhân <b>Nguyễn Văn A</b> đã đặt lịch hẹn.</li>
-                            <li>Bác sĩ <b>Trần Thị B</b> hoàn thành ca khám.</li>
-                            <li>Bệnh nhân <b>Lê Văn C</b> hủy lịch hẹn.</li>
-                        </ul>
-                    </div>
+        <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+            <div className="flex-1 flex flex-col w-full">
+                <main className="p-6 space-y-8">
+                    <StatsCardsSection doctors={doctors} patients={patients} services={services} appointmentRequest={appointmentRequest} />
+                    <AppointmentRequestSection services={services} appointmentRequest={appointmentRequest} />
                 </main>
             </div>
         </div>

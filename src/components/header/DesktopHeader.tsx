@@ -10,13 +10,13 @@ import {
 	NavigationMenuList
 } from '@/components/ui/navigation-menu'
 import {AuthButton} from '@/components/header/AuthButton'
-import {useFindAllAppointmentRequest} from "@/lib/hooks/appointment-request/useFindAllAppointmentRequest";
+import {useFindAllAppointmentRequestById} from "@/lib/hooks/appointment-request/useFindAllAppointmentRequestById";
 import {usePathname} from "next/navigation";
 
 export default function DesktopHeader() {
 	const { data: session } = useSession()
 	const pathNameRouter = usePathname()
-	const { data: appointmentRequest } = useFindAllAppointmentRequest()
+	const { data: appointmentRequest } = useFindAllAppointmentRequestById()
 	
 	const lNavLinks = [
 		{ href: '/doctor', label: 'Bác sĩ', icon: <User2Icon className="w-4 h-4 text-white" /> },

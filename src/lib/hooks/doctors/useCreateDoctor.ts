@@ -12,7 +12,6 @@ export function useCreateDoctor() {
 	return useMutation({
 		mutationKey: ["createDoctor"],
 		mutationFn: async (payload: CreateDoctorDto) => {
-			if (!session?.access_token) throw new Error("Not authenticated");
 			
 			const res = await axios.post(
 				CREATE_DOCTOR_API_URL,

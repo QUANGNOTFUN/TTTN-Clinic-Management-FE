@@ -5,7 +5,7 @@ import {useRouter} from "next/navigation"
 import React, {useEffect} from "react"
 import {CustomSession, Role} from "@/types/login";
 
-export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+export default function ProtectedAdminLayout({ children }: { children: React.ReactNode }) {
     const { data, status } = useSession() as { data: CustomSession, status: string }
     const router = useRouter()
     

@@ -63,17 +63,17 @@ export default function AdminLoginPage() {
 				toast.success('Đăng nhập thành công!');
 				setTimeout(() => {
 					router.push('/admin-dashboard');
-				}, 1000);
+				}, 500);
 			} else if (user?.role === Role.DOCTOR) {
 				toast.success('Đăng nhập thành công!');
 				setTimeout(() => {
 					router.push('/doctor-dashboard');
-				}, 1000);
+				}, 500);
 			} else {
 				toast.error("Không có quyền truy cập trang này!");
 				setTimeout(() => {
 					router.push('/');
-				}, 1000);
+				}, 500);
 			}
 		}
 	}, [router, session.data?.user]);

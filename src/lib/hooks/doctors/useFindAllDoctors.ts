@@ -6,7 +6,7 @@ import {Doctor} from "@/types/doctor";
 import {FIND_ALL_DOCTORS_API_URL} from "@/lib/api/doctor";
 
 export function useFindAllDoctors() {
-	const { data: sessions } = useSession() as { data: CustomSession };
+	const { data: session } = useSession() as { data: CustomSession };
 	
 	return useQuery({
 		queryKey: ["doctors"],
@@ -15,12 +15,14 @@ export function useFindAllDoctors() {
 				FIND_ALL_DOCTORS_API_URL,
 				{
 					headers: {
-						Authorization: `Bearer ${sessions?.access_token}`,
+						Authorization: `Bearer ${session?.access_token}`,
 					},
 				}
 			)
 			return res.data;
 		},
-		enabled: !!sessions?.access_token,
+		refetchOnWindowFocus: false,
+		retry: 1,
+		enabled: !!session?.access_token,
 	});
 }

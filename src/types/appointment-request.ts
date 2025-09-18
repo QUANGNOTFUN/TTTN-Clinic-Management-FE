@@ -6,7 +6,7 @@ export type CreateAppointmentRequestDto = {
 	appointment_time: string;
 };
 
-export type Appointment = {
+export type AppointmentRequest = {
 	id: string;
 	full_name: string;
 	phone_number: string;

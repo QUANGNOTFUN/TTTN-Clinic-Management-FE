@@ -4,13 +4,6 @@ export enum Shift {
 	OVERTIME = 'OVERTIME',
 }
 
-export type CreateDoctorScheduleDto = {
-  doctor_id: string;
-  date: string;
-  shift: Shift;
-  consecutiveWeeks: number;
-}
-
 export type DoctorSchedule = {
   id: string;
   doctor_id: string;

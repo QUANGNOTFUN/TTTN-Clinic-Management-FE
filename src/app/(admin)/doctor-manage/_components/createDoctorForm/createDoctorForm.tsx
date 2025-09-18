@@ -127,7 +127,7 @@ export function CreateDoctorForm(
 						/>
 						<Button
 							type="submit"
-							className="cursor-pointer w-full bg-gradient-to-br from-teal-400 to-teal-500 text-gray-800 hover:from-teal-600 hover:to-teal-700 transition-all duration-200"
+							className="cursor-pointer w-full bg-gradient-to-br from-teal-300 to-teal-200 text-gray-800 hover:from-teal-400 hover:to-teal-500 transition-all duration-200"
 						>
 							Tạo Bác Sĩ
 						</Button>

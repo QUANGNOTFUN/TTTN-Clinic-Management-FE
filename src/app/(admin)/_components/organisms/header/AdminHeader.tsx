@@ -1,6 +1,6 @@
 "use client";
 
-import {ChevronDown, LogOut, User} from "lucide-react"; // Thêm import này
+import {ChevronDown, LogOut, User} from "lucide-react";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {signOut, useSession} from "next-auth/react";
 import Link from "next/link";
@@ -19,7 +19,11 @@ export default function AdminHeader() {
     { href: "/admin-dashboard", label: "Dashboard" },
     { href: "/doctor-manage", label: "Bác sĩ" },
     { href: "/patient-manage", label: "Bệnh nhân" },
+    { href: "/service-manage", label: "Dịch vụ khám" },
     { href: "/schedule-manage", label: "Lịch làm việc" },
+    { href: "/appointment-request-manage", label: "Hẹn khám" },
+    { href: "/appointment-queue-manage", label: "Hàng chờ khám" },
+    { href: "/revenue-manage", label: "Doanh thu" },
   ];
   
   return (
@@ -45,7 +49,7 @@ export default function AdminHeader() {
       </div>
 
       {/* Middle: Navigation (desktop) */}
-      <nav className="hidden md:flex gap-6 text-md font-medium text-gray-600">
+      <nav className="hidden md:flex gap-3 text-sm font-medium text-gray-600">
         {navigation.map((item) => (
           <Link
             key={item.href}
@@ -69,7 +73,7 @@ export default function AdminHeader() {
       {/* Right: User Info */}
       <div className="flex items-center gap-2">
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg transition-colors outline-none">
+          <DropdownMenuTrigger className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg transition-colors outline-none cursor-pointer">
             <Avatar className="h-8 w-8">
               <AvatarImage src={session?.user?.image ?? ""} />
               <AvatarFallback>

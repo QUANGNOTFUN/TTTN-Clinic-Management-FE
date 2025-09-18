@@ -1,18 +1,13 @@
 "use client";
 
-import { useFindAllPatients } from "@/lib/hooks/patients/useFindAllPatients";
-import { Badge } from "@/components/ui/badge";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
-import { Patient } from "@/types/patient"; // Đảm bảo import kiểu Patient
-import { AdminManagerTable } from "@/app/(admin)/_components/organisms/adminManagerTable/adminManagerTable";
-import { ColumnDef } from "@tanstack/react-table";
+import {useFindAllPatients} from "@/lib/hooks/patients/useFindAllPatients";
+import {Badge} from "@/components/ui/badge";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,} from "@/components/ui/dropdown-menu";
+import {Button} from "@/components/ui/button";
+import {MoreHorizontal} from "lucide-react";
+import {Patient} from "@/types/patient";
+import {AdminManagerTable} from "@/app/(admin)/_components/organisms/adminManagerTable/AdminManagerTable";
+import {ColumnDef} from "@tanstack/react-table";
 import React from "react";
 
 export default function PatientManagePage() {
@@ -23,47 +18,26 @@ export default function PatientManagePage() {
 	};
 	
 	const columns: ColumnDef<Patient>[] = [
+		{ id: "index", header: "STT", cell: (info) => info.row.index + 1, },
+		{ accessorKey: "full_name", header: "Tên", },
+		{ accessorFn: (row: Patient) => row.user?.email ?? "-", id: "email", header: "Email", },
+		{ accessorKey: "gender", header: "Giới tính", },
+		{ accessorKey: "date_of_birth", header: "Ngày sinh", },
+		{ accessorKey: "medical_history", header: "Tiền sử bệnh", },
+		{ accessorKey: "address", header: "Địa chỉ", },
+		{ accessorKey: "phone_number", header: "SĐT", },
+		{ accessorKey: "blood_type", header: "Nhóm máu", },
+		{ accessorKey: "emergency_contact", header: "Người liên hệ khẩn", },
+		{ accessorKey: "insurance_number", header: "Số bảo hiểm", },
+		{ accessorKey: "created_at", header: "Ngày tạo", },
+		{ accessorKey: "updated_at", header: "Cập nhật", },
 		{
-			id: "index", header: "STT", cell: (info) => info.row.index + 1,
-		},
-		{
-			accessorKey: "full_name", header: "Tên",
-		},
-		{
-			accessorFn: (row: Patient) => row.user?.email ?? "-", id: "email", header: "Email",
-		},
-		{
-			accessorKey: "gender", header: "Giới tính",
-		},
-		{
-			accessorKey: "date_of_birth", header: "Ngày sinh",
-		},
-		{
-			accessorKey: "medical_history", header: "Tiền sử bệnh",
-		},
-		{
-			accessorKey: "address", header: "Địa chỉ",
-		},
-		{
-			accessorKey: "phone_number", header: "SĐT",
-		},
-		{
-			accessorKey: "blood_type", header: "Nhóm máu",
-		},
-		{
-			accessorKey: "emergency_contact", header: "Người liên hệ khẩn",
-		},
-		{
-			accessorKey: "insurance_number", header: "Số bảo hiểm",
-		},
-		{
-			accessorKey: "created_at", header: "Ngày tạo",
-		},
-		{
-			accessorKey: "updated_at", header: "Cập nhật",
-		},
-		{
-			accessorKey: "user_id", header: "Trạng thái", cell: () => <Badge variant="outline">ACTIVE</Badge>,
+			accessorKey: "user_id", header: "Trạng thái",
+			cell: ({ row }) => (
+				<Badge variant="outline" className="capitalize">
+					{row.original.user.is_active === true ? "Active" : "Inactive"}
+				</Badge>
+			),
 		},
 		{
 			id: "actions",

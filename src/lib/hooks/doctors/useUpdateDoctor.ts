@@ -1,53 +1,41 @@
-import { Reference, StoreObject, useMutation } from "@apollo/client";
-import { UPDATE_DOCTOR } from "@/libs/graphqls/doctors";
-import {UpdateDoctorInput} from "@/types/doctors";
-
-export interface UpdateDoctorResponse {
-	updateDoctor: {
-		id: string;
-		user: {
-			id: string;
-			email?: string | null;
-			full_name?: string  | null;
-			gender?: "MALE" | "FEMALE" | "OTHER" | null;
-		};
-		qualifications?: string | null;
-		work_seniority?: number | null;
-		specialty?: string | null;
-		hospital?: string | null;
-	};
-}
+import {useMutation} from "@tanstack/react-query";
+import {UpdateDoctorDto} from "@/types/doctor";
+import axios, {AxiosError} from "axios";
+import {UPDATE_DOCTOR_API_URL} from "@/lib/api/doctor";
+import { useSession } from "next-auth/react";
+import { CustomSession } from "@/types/login";
+import {toast} from "react-toastify";
 
 export function useUpdateDoctor() {
-	const [updateDoctor, { data, loading, error }] = useMutation<
-		UpdateDoctorResponse,
-		{ id: string; doctorData: UpdateDoctorInput }
-	>(UPDATE_DOCTOR, {
-		update(cache, { data }) {
-			if (data?.updateDoctor) {
-				cache.modify({
-					fields: {
-						doctors(existingDoctors = [], { readField }) {
-							return existingDoctors.map(
-								(doctor: Reference | StoreObject | undefined) =>
-									readField("id", doctor) === data.updateDoctor.id
-										? data.updateDoctor
-										: doctor
-							);
-						},
-					},
-				});
-			}
+	const { data: session } = useSession() as { data: CustomSession | null };
+	
+	return useMutation({
+		mutationKey: ["updateDoctor"],
+		mutationFn: async ({ id, payload }: {
+			id: string;
+			payload: UpdateDoctorDto;
+		}) => {
+			if (!session?.access_token) throw new Error("Not authenticated");
+			
+			const res = await axios.put(
+				UPDATE_DOCTOR_API_URL(id),
+				payload, {
+				headers: {
+					Authorization: `Bearer ${session?.access_token}`,
+				},
+			});
+			
+			return res.data;
+		},
+		onSuccess: () => {
+			toast.success("Cập nhật bác sĩ thành công", {
+				toastId: "update-doctor-success",
+			});
+		},
+		onError: (error: AxiosError) => {
+			toast.error(error?.message || "Có lỗi xảy ra", {
+				toastId: "update-doctor-error",
+			});
 		},
 	});
-
-	const update = (id: string, doctorData: UpdateDoctorInput) =>
-		updateDoctor({ variables: { id, doctorData } });
-
-	return {
-		update,
-		data: data?.updateDoctor ?? null,
-		loading,
-		error,
-	};
 }

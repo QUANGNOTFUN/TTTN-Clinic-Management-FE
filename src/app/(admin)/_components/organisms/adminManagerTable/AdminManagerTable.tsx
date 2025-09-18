@@ -12,6 +12,9 @@ import {
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {format} from 'date-fns';
+import {
+	AdminManagerTableSkeleton
+} from "@/app/(admin)/_components/organisms/adminManagerTable/AdminManagerTableSkeleton";
 
 interface TableProps<T> {
 	data: T[];
@@ -79,6 +82,10 @@ export function AdminManagerTable<T extends Record<string, unknown>>(props: Tabl
 		},
 	});
 	
+	if (data.length === 0) {
+		return <AdminManagerTableSkeleton columns={columns.length} rows={pageSize} />;
+	}
+	
 	return (
 	  <div className="p-6 space-y-6 bg-white rounded-md">
 	    {searchField && (
@@ -120,21 +127,28 @@ export function AdminManagerTable<T extends Record<string, unknown>>(props: Tabl
 	    ) : (
 	      <div className="overflow-x-auto rounded-md border border-gray-200">
 	        <table className="w-full table-auto [&_td]:border [&_th]:border border-collapse text-center">
-	          <thead className="bg-gray-50 text-gray-800">
-	            {table.getHeaderGroups().map((headerGroup) => (
-	              <tr key={headerGroup.id}>
-	                {headerGroup.headers.map((header) => (
-	                  <th
-	                    key={header.id}
-	                    className="border-b border-gray-200 p-3 text-left font-semibold text-sm"
-	                  >
-	                    {flexRender(header.column.columnDef.header, header.getContext())}
-	                  </th>
-	                ))}
-	              </tr>
-	            ))}
-	          </thead>
-	          <tbody className="bg-white">
+		        <thead className="bg-gray-100 text-gray-800 select-none">
+		        {table.getHeaderGroups().map((headerGroup) => (
+			        <tr key={headerGroup.id}>
+				        {headerGroup.headers.map((header) => (
+					        <th
+						        key={header.id}
+						        className="
+						            border-b border-gray-200 px-4 py-2
+						            text-center text-sm font-semibold
+						            whitespace-nowrap
+						            resize-x overflow-hidden
+						          "
+						        style={{ minWidth: "100px" }}
+					        >
+						        {flexRender(header.column.columnDef.header, header.getContext())}
+					        </th>
+				        ))}
+			        </tr>
+		        ))}
+		        </thead>
+		        
+		        <tbody className="bg-white">
 	            {table.getRowModel().rows.map((row) => (
 	              <tr
 	                key={row.id}

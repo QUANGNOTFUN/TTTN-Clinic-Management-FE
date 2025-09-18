@@ -13,6 +13,7 @@ export type Patient = {
 	updated_at?: string;
 	user: {
 		email: string;
+		is_active: boolean;
 	};
 };
 export type PatientUpdate = {

@@ -2,8 +2,8 @@ import React from 'react';
 import '../globals.css';
 import type {Metadata} from "next";
 import {ToastContainer} from "react-toastify";
-import ProtectedLayout from "@/app/(admin)/protectedLayout";
 import AdminHeader from "@/app/(admin)/_components/organisms/header/AdminHeader";
+import ProtectedAdminLayout from "@/app/(admin)/protectedAdminLayout";
 
 export const metadata: Metadata = {
   title: "Quản lí phòng khám",
@@ -16,7 +16,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-      <ProtectedLayout>
+      <ProtectedAdminLayout>
           <div className={"min-h-screen "}>
               <AdminHeader />
               <main className={"pt-16 bg-gray-100 min-h-screen"}>
@@ -35,6 +35,6 @@ export default function AdminLayout({
               pauseOnHover={false}
               theme={"light"}
           />
-      </ProtectedLayout>
+      </ProtectedAdminLayout>
   );
 }
