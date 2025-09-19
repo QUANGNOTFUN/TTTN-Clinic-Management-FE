@@ -75,7 +75,7 @@ export default function AdminHeader() {
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg transition-colors outline-none cursor-pointer">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={session?.user?.image ?? ""} />
+              <AvatarImage src={""} />
               <AvatarFallback>
                 <User className="h-4 w-4" />
               </AvatarFallback>

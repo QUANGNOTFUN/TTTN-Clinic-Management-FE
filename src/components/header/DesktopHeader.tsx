@@ -12,11 +12,12 @@ import {
 import {AuthButton} from '@/components/header/AuthButton'
 import {useFindAllAppointmentRequestById} from "@/lib/hooks/appointment-request/useFindAllAppointmentRequestById";
 import {usePathname} from "next/navigation";
+import {CustomSession} from "@/types/login";
 
 export default function DesktopHeader() {
-	const { data: session } = useSession()
+	const { data: session } = useSession() as { data: CustomSession | null };
 	const pathNameRouter = usePathname()
-	const { data: appointmentRequest } = useFindAllAppointmentRequestById()
+	const { data: appointmentRequest } = useFindAllAppointmentRequestById(session?.user.id);
 	
 	const lNavLinks = [
 		{ href: '/doctor', label: 'Bác sĩ', icon: <User2Icon className="w-4 h-4 text-white" /> },

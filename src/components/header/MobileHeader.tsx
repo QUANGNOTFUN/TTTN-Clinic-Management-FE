@@ -17,11 +17,12 @@ import Image from "next/image";
 import {DialogTitle} from "@radix-ui/react-dialog";
 import {usePathname} from "next/navigation";
 import {useFindAllAppointmentRequestById} from "@/lib/hooks/appointment-request/useFindAllAppointmentRequestById";
+import {CustomSession} from "@/types/login";
 
 export default function MobileHeader() {
-	const { data: session } = useSession();
+	const { data: session } = useSession() as { data: CustomSession | null};
 	const pathname = usePathname();
-	const { data: appointmentRequest } = useFindAllAppointmentRequestById();
+	const { data: appointmentRequest } = useFindAllAppointmentRequestById(session?.user.id);
 	
 	const tNavLinks = [
 		{ href: "/doctor", label: "Bác sĩ", icon: <User2Icon className="w-5 h-5" /> },
