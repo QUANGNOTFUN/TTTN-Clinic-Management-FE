@@ -17,7 +17,7 @@ import {CustomSession} from "@/types/login";
 export default function DesktopHeader() {
 	const { data: session } = useSession() as { data: CustomSession | null };
 	const pathNameRouter = usePathname()
-	const { data: appointmentRequest } = useFindAllAppointmentRequestById(session?.user.id);
+	const { data: appointmentRequest = [] } = useFindAllAppointmentRequestById(session?.user.id);
 	
 	const lNavLinks = [
 		{ href: '/doctor', label: 'Bác sĩ', icon: <User2Icon className="w-4 h-4 text-white" /> },
@@ -26,7 +26,7 @@ export default function DesktopHeader() {
 	]
 	
 	const rNavLinks = [
-		{ href: '/appointment', label: 'Lịch hẹn', icon: <BookHeartIcon className="w-4 h-4 text-white" />, isDotIndicator: appointmentRequest },
+		{ href: '/appointment', label: 'Lịch hẹn', icon: <BookHeartIcon className="w-4 h-4 text-white" />, isDotIndicator: appointmentRequest.length > 0 },
 	]
 	
 	return (
