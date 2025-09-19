@@ -10,7 +10,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import {VscLoading} from "react-icons/vsc";
-import {AppointmentFormCard} from "./_components/organism/AppointmentFormCard";
+import {AppointmentFormCard} from "./_components/molecules/AppointmentFormCard";
 import {useFindOnePatient} from "@/lib/hooks/patients/useFindOnePatient";
 
 export default function BookingPage() {

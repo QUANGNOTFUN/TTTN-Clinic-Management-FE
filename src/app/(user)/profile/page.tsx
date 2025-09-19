@@ -1,37 +1,21 @@
 "use client";
 
-import { useFindOnePatient } from "@/lib/hooks/patients/useFindOnePatient";
-import { VscLoading } from "react-icons/vsc";
+import {useFindOnePatient} from "@/lib/hooks/patients/useFindOnePatient";
+import {VscLoading} from "react-icons/vsc";
 import Image from "next/image";
 import {useSession} from "next-auth/react";
 import {CustomSession} from "@/types/login";
-import {useEffect} from "react";
+import {Button} from "@/components/ui/button";
+import {Edit3Icon} from "lucide-react";
+import {useState} from "react";
+import {ProfileUpdateForm} from "@/app/(user)/profile/_component/ProfileUpdateForm";
+import {useUpdatePatient} from "@/lib/hooks/patients/useUpdatePatient";
 
 export default function ProfilePage() {
-    const session = useSession() as { data: CustomSession };
-    const { data, isLoading, isError, error } = useFindOnePatient();
-    
-    useEffect(() => {
-        if (session?.data?.user.email) {
-        
-        }
-    }, []);
-    
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-zinc-100">
-                <VscLoading className="animate-spin text-black text-[50px]" />
-            </div>
-        );
-    }
-    
-    if (isError) {
-        return (
-            <div className="p-6 text-red-600">
-                <p>Lỗi: {error.message}</p>
-            </div>
-        );
-    }
+    const { data: session } = useSession() as { data: CustomSession };
+    const { data, isLoading, isError, error, refetch } = useFindOnePatient();
+    const [isEdit, setIsEdit] = useState<boolean>(false);
+    const { mutateAsync: updatePatient } = useUpdatePatient();
     
     const translateGender = (gender?: string | null) => {
         switch (gender?.toUpperCase()) {
@@ -73,12 +57,40 @@ export default function ProfilePage() {
             ],
         },
     ];
+    if (isEdit) {
+        return (
+            <ProfileUpdateForm
+                open={isEdit}
+                onOpenChange={setIsEdit}
+                patient={data}
+                onSubmit={(data) =>
+                    updatePatient({id: session.user.id, payload: data})
+                        .finally(() => refetch())
+            }
+            />
+        );
+    }
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-zinc-100">
+                <VscLoading className="animate-spin text-black text-[50px]" />
+            </div>
+        );
+    }
+    
+    if (isError) {
+        return (
+            <div className="p-6 text-red-600">
+                <p>Lỗi: {error.message}</p>
+            </div>
+        );
+    }
     
     return (
         <div className="min-h-screen pt-14 p-6 bg-gradient-to-b from-gray-50 to-gray-100 overflow-y-auto">
             <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row items-center gap-6 bg-white p-6 rounded-2xl shadow">
+                <div className="relative flex flex-col md:flex-row items-center gap-6 bg-white p-6 rounded-2xl shadow">
                     <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-md">
                         <Image
                             src="/default-avatar.png"
@@ -89,12 +101,19 @@ export default function ProfilePage() {
                     </div>
                     <div className="text-center md:text-left space-y-2">
                         <h1 className="text-3xl md:text-2xl font-bold text-gray-800">
-                            {session?.data?.user.email || "Chưa cập nhật tên"}
+                            {session?.user.email || "Chưa cập nhật tên"}
                         </h1>
                         <p className="text-gray-500 text-sm md:text-base">
                             {"User_Id: " + data?.user_id || "Chưa cập nhật email"}
                         </p>
                     </div>
+                    <Button
+                        onClick={() => setIsEdit(!isEdit)}
+                        className="absolute top-2 right-2 cursor-pointer bg-emerald-300 hover:bg-emerald-600 text-zinc-700 hover:text-zinc-50"
+                    >
+                        <Edit3Icon />
+                        <span>Cập nhật</span>
+                    </Button>
                 </div>
                 
                 {/* Sections */}

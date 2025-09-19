@@ -1,6 +1,6 @@
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { Bell, Calendar, Contact, LogOut } from "lucide-react"
+import {Bell, BookMarked, Calendar, Contact, LogOut} from "lucide-react"
 import { signOut } from "next-auth/react"
 import { useFindOnePatient } from "@/lib/hooks/patients/useFindOnePatient"
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
@@ -10,7 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 // Nav items
 const navItems = [
 	{ href: "/profile", label: "Thông tin cá nhân", icon: Contact },
-	{ href: "/appointment", label: "Quản lý lịch hẹn", icon: Calendar },
+	{ href: "/appointment", label: "Lịch hẹn", icon: Calendar },
+	{ href: "/", label: "Lịch sử khám", icon: BookMarked },
 	{ href: "/notifications", label: "Thông báo", icon: Bell },
 ]
 
