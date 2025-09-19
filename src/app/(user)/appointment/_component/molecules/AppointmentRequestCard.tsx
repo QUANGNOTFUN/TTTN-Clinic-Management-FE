@@ -1,24 +1,23 @@
 import {format} from "date-fns"
 import {Clock, Info, Phone} from "lucide-react"
-import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
+import {Card, CardContent, CardFooter, CardHeader, CardTitle,} from "@/components/ui/card"
 import {Button} from "@/components/ui/button"
-import {useEffect, useState} from "react"
-import {useRouter} from "next/navigation"
-import {CountdownCircleTimer} from 'react-countdown-circle-timer'
-import {useCancelAppointmentRequest} from "@/lib/hooks/appointment-request/useCancelAppointmentRequest";
-import {toast} from "react-toastify";
-import {Appointment} from "@/types/appointment-request";
+import {useState} from "react"
+import {CountdownCircleTimer} from "react-countdown-circle-timer"
+import {useCancelAppointmentRequest} from "@/lib/hooks/appointment-request/useCancelAppointmentRequest"
+import {AppointmentRequest} from "@/types/appointment-request";
 
 interface AppointmentRequestCardProps {
-    appointment: Appointment
+    appointment: AppointmentRequest
+    onCancel?: (id: string) => void
 }
 
 export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
-    const { appointment } = props
-    const targetTime = new Date(appointment.appointment_time).getTime()
+    const { appointment, onCancel } = props
+    let targetTime = new Date(appointment.appointment_time).getTime()
+    targetTime -= 30 * 60 * 1000 // 30 phút trước
     const [timeLeft, setTimeLeft] = useState(targetTime - Date.now())
-    const totalDuration = 60 * 60;
-    const { mutateAsync: cancel, isSuccess, data, error } = useCancelAppointmentRequest()
+    const totalDuration = 60 * 60
     
     const formatDateTime = (dateString: string) => {
         try {
@@ -28,7 +27,10 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
         }
     }
     
-    const statusMap: Record<string, { text: string; className: string }> = {
+    const statusMap: Record<
+        string,
+        { text: string; className: string }
+    > = {
         PENDING: {
             text: "Đang chờ",
             className: "bg-amber-100 text-amber-800 ring-amber-200",
@@ -41,43 +43,26 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
             text: "Đã hủy",
             className: "bg-red-100 text-red-800 ring-red-200",
         },
-        COMPLETED: {
-            text: "Hoàn thành",
-            className: "bg-blue-100 text-blue-800 ring-blue-200",
+        REJECTED: {
+            text: "Từ chối",
+            className: "bg-orange-100 text-orange-800 ring-blue-200",
         },
     }
     
     const handleCancel = async (id: string) => {
-        await cancel(id);
+        onCancel(id)
     }
-    const router = useRouter()
-
-    useEffect(() => {
-        if (isSuccess) {
-            toast.success(data?.message ?? "Hủy lịch hẹn thành công")
-        }
-        if (error) {
-            toast.error(error?.message ?? "Có lỗi xảy ra")
-        }
-    }, [data?.message, error, isSuccess, router]);
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setTimeLeft(targetTime - Date.now())
-        }, 1000)
-        return () => clearInterval(interval)
-    }, [targetTime])
     
     return (
         <Card className="rounded-xl shadow-sm border hover:shadow-md transition-all">
             {/* Header */}
             <CardHeader className="flex flex-col items-start gap-1.5">
-                {/* FullName Patient */}
                 <div className="flex items-start justify-between gap-2 w-full">
                     <CardTitle className="truncate text-2xl font-bold tracking-tight text-gray-900">
                         {appointment.full_name}
                     </CardTitle>
                     
-                    {/* Hiện đồng hồ nếu còn pending */}
+                    {/* Nếu pending thì hiển thị countdown */}
                     {appointment.status === "PENDING" ? (
                         <CountdownCircleTimer
                             isPlaying
@@ -88,7 +73,7 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
                             size={32}
                             strokeWidth={5}
                         >
-                            {({remainingTime}) => {
+                            {({ remainingTime }) => {
                                 const hrs = Math.floor(remainingTime / 3600)
                                 const mins = Math.floor((remainingTime % 3600) / 60)
                                 const secs = remainingTime % 60
@@ -101,25 +86,21 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
                                 )
                             }}
                         </CountdownCircleTimer>
-                        ) : (
-                        // Nếu status SUCCESS hoặc CANCELED thì hiện badge
+                    ) : (
+                        // Badge theo statusMap
                         <span
-                            className={`p-2 text-xs font-semibold rounded-md ${
-                                appointment.status === "SUCCESS"
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-red-100 text-red-700"
-                            }`}
+                            className={`px-2 py-1 text-xs font-semibold rounded-md ${statusMap[appointment.status]?.className}`}
                         >
-                            {appointment.status === "SUCCESS" ? "Thành công" : "Đã hủy"}
+                          {statusMap[appointment.status]?.text ?? appointment.status}
                         </span>
                     )}
-            </div>
-            
-            {/*ID Appointment*/}
-            <p className="text-xs uppercase text-gray-400 tracking-widest">
-                ID: {appointment.id}
-            </p>
-        </CardHeader>
+                </div>
+                
+                {/*ID Appointment*/}
+                <p className="text-xs uppercase text-gray-400 tracking-widest">
+                    ID: {appointment.id}
+                </p>
+            </CardHeader>
             
             {/* Content */}
             <CardContent className="flex flex-row items-start justify-between text-gray-700 gap-2">
@@ -134,7 +115,6 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
                     </div>
                 </div>
                 
-                {/* Divider */}
                 <div className="w-px bg-gray-200 self-stretch" />
                 
                 {/* Thời gian */}
@@ -148,6 +128,7 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
                     </div>
                 </div>
             </CardContent>
+            
             <CardContent className="flex items-center justify-center gap-2">
                 <Info className="h-5 w-5 text-red-400" />
                 <p className="text-xs italic font-medium text-gray-500">
@@ -155,15 +136,17 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
                 </p>
             </CardContent>
             
-            {/* Footer (nút hành động) */}
-            <CardFooter className="flex items-center justify-around  border-t border-gray-200">
-                <p className=" text-xs text-gray-500 ">
+            {/* Footer */}
+            <CardFooter className="flex items-center justify-around border-t border-gray-200">
+                <p className="text-xs text-gray-500 ">
                     Ngày đăng ký: {formatDateTime(appointment.created_at)}
                 </p>
                 {appointment.status === "PENDING" && (
                     <Button
                         size="default"
-                        className={"text-sm font-medium text-white bg-red-400 hover:bg-red-600 cursor-pointer"}
+                        className={
+                            "text-sm font-medium text-white bg-red-400 hover:bg-red-600 cursor-pointer"
+                        }
                         onClick={() => handleCancel(appointment.id)}
                     >
                         Hủy lịch

@@ -4,7 +4,6 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import {useEffect} from "react"
 import {toast} from "react-toastify"
 import {CreateAppointmentRequestDto} from "@/types/appointment-request"
-import {ClinicServiceResponse} from "@/types/clinic-service"
 import {useCreateAppointmentRequest} from "@/lib/hooks/appointment-request/useCreateAppointmentRequest"
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form"
 import {Input} from "@/components/ui/input"
@@ -13,10 +12,11 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group"
 import {Patient} from "@/types/patient";
 import {AxiosError} from "axios";
+import {ClinicService} from "@/types/clinic-service";
 
 export type AppointmentFormCardProps = {
 	className?: string
-	service?: ClinicServiceResponse
+	service?: ClinicService
 	userId?: Patient['user_id']
 }
 
@@ -47,7 +47,7 @@ export function AppointmentFormCard({ className, service, userId }: AppointmentF
 	})
 	
 	useEffect(() => {
-		if (isPending) toast.info("Đang tạo đơn hàng")
+		if (isPending) toast.info("Đang gửi yêu cầu đặt lịch, vui lòng chờ...")
 		if (isError) {
 			const errMsg = (error as AxiosError<{message: string}>)?.response?.data?.message
 			toast.error(`Lỗi: ${errMsg}`)
@@ -92,17 +92,20 @@ export function AppointmentFormCard({ className, service, userId }: AppointmentF
 	return (
 		<div
 			className={`rounded-2xl p-6 md:p-10 shadow-md ${className}
-				 bg-gradient-to-br from-gray-700 to-gray-500
+				 bg-gradient-to-tr from-gray-400 via-slate-300 to-gray-200
 			`}
 		>
 			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 text-white flex flex-col overflow-y-auto h-full">
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className="space-y-4 flex flex-col overflow-y-auto h-full "
+				>
 					<FormField
 						control={form.control}
 						name="full_name"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Họ và tên *</FormLabel>
+								<FormLabel className="text-base md:text-lg font-semibold">Họ và tên *</FormLabel>
 								<FormControl>
 									<Input placeholder="Nhập họ và tên" {...field} />
 								</FormControl>
@@ -116,7 +119,7 @@ export function AppointmentFormCard({ className, service, userId }: AppointmentF
 						name="phone_number"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Số điện thoại *</FormLabel>
+								<FormLabel className="text-base md:text-lg font-semibold">Số điện thoại *</FormLabel>
 								<FormControl>
 									<Input type="tel" placeholder="Nhập số điện thoại" {...field} />
 								</FormControl>
@@ -131,7 +134,7 @@ export function AppointmentFormCard({ className, service, userId }: AppointmentF
 							name="doctorId"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Chọn bác sĩ</FormLabel>
+									<FormLabel className="text-base md:text-lg font-semibold">Chọn bác sĩ</FormLabel>
 									<Select onValueChange={field.onChange}  value={field.value}>
 									<FormControl>
 											<SelectTrigger>
@@ -154,7 +157,7 @@ export function AppointmentFormCard({ className, service, userId }: AppointmentF
 						name="date"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Ngày hẹn *</FormLabel>
+								<FormLabel className="text-base md:text-lg font-semibold">Ngày hẹn *</FormLabel>
 								<FormControl>
 									<Input type="date" {...field} />
 								</FormControl>
@@ -163,13 +166,13 @@ export function AppointmentFormCard({ className, service, userId }: AppointmentF
 						)}
 					/>
 					
-					<div className="flex flex-col md:flex-row md:items-center md:space-x-20 space-y-4 md:space-y-0">
+					<div className="flex flex-col md:flex-row md:items-start md:space-x-20 space-y-4 md:space-y-0">
 						<FormField
 							control={form.control}
 							name="shift"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Ca làm việc *</FormLabel>
+									<FormLabel className="text-base md:text-lg font-semibold">Ca làm việc *</FormLabel>
 									<FormControl>
 										<RadioGroup
 											onValueChange={field.onChange}
@@ -196,13 +199,13 @@ export function AppointmentFormCard({ className, service, userId }: AppointmentF
 							name="time"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Giờ hẹn *</FormLabel>
+									<FormLabel className="text-base md:text-lg font-semibold">Giờ hẹn *</FormLabel>
 									<FormControl>
 										<Input type="time" {...field} min={timeRange?.min} max={timeRange?.max} />
 									</FormControl>
 									<FormMessage />
 									{shift && (
-										<p className="text-sm text-gray-400 italic">
+										<p className="text-sm sm:text-base text-gray-900 italic">
 											{shift === "MORNING"
 												? "Chọn giờ từ 08:00 đến 11:30"
 												: "Chọn giờ từ 13:30 đến 17:00"}
@@ -212,7 +215,6 @@ export function AppointmentFormCard({ className, service, userId }: AppointmentF
 							)}
 						/>
 					</div>
-					
 					
 					<Button size={"default"} type="submit" className="mx-auto my-auto items-end cursor-pointer">Xác nhận đặt lịch</Button>
 				</form>

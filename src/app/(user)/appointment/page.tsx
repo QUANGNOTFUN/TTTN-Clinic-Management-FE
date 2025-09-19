@@ -10,18 +10,20 @@ import {
     AppointmentRequestFilterBadgeProps
 } from "@/app/(user)/appointment/_component/molecules/AppointmentRequestFilterBadge";
 import {useClientFilter} from "@/lib/hooks/filters/useClientFilter";
-import {Appointment} from "@/types/appointment-request";
 import {useSession} from "next-auth/react";
 import {CustomSession} from "@/types/login";
+import {AppointmentRequest} from "@/types/appointment-request";
+import {useCancelAppointmentRequest} from "@/lib/hooks/appointment-request/useCancelAppointmentRequest";
 
 export default function AppointmentsPage() {
     const { data: session } = useSession() as { data: CustomSession };
-    const { data, isLoading, isError, error } = useFindAllAppointmentRequestById(session?.user.id);
+    const { data, isLoading, isError, error, refetch } = useFindAllAppointmentRequestById(session?.user.id);
+    const { mutateAsync: cancelAppointment } = useCancelAppointmentRequest();
     const [statusFilter, setStatusFilter] = useState<AppointmentRequestFilterBadgeProps['status']>()
     const [sortFilter, setSortFilter] = useState<AppointmentRequestFilterBadgeProps['sort']>()
     const [currentPage, setCurrentPage] = useState<number>(1)
     const { data: filteredData, totalPages } =
-        useClientFilter<Appointment, AppointmentRequestFilterBadgeProps['status']>({
+        useClientFilter<AppointmentRequest, AppointmentRequestFilterBadgeProps['status']>({
             data: data || [],
             filterField: "status",
             allValue: "ALL",
@@ -85,6 +87,7 @@ export default function AppointmentsPage() {
                     <AppointmentRequestCard
                         key={appointment.id}
                         appointment={appointment}
+                        onCancel={(id) => cancelAppointment(id).then(() => refetch())}
                     />
                 ))}
             </div>

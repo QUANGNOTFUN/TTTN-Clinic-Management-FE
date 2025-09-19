@@ -1,10 +1,10 @@
 import Image from "next/image";
-import { ClinicServiceResponse } from "@/types/clinic-service";
+import {ClinicService} from "@/types/clinic-service";
 
 export type ClinicServicesCardType = {
 	className: string;
 	url_image?: string;
-	item: ClinicServiceResponse;
+	item: ClinicService;
 	isSelected?: boolean;
 };
 

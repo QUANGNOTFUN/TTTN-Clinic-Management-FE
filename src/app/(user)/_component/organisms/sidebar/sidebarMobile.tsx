@@ -3,7 +3,7 @@ import { signOut } from "next-auth/react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import {
-	Bell,
+	Bell, BookMarked,
 	Calendar,
 	Contact,
 	LogOut,
@@ -18,7 +18,8 @@ import {getAccountAge} from "@/app/(user)/_component/organisms/sidebar/sidebarDe
 
 const navItems = [
 	{ href: "/profile", label: "Thông tin cá nhân", icon: Contact },
-	{ href: "/appointment", label: "Quản lý lịch hẹn", icon: Calendar },
+	{ href: "/appointment", label: "Lịch hẹn", icon: Calendar },
+	{ href: "/", label: "Lịch sử khám", icon: BookMarked },
 	{ href: "/notifications", label: "Thông báo", icon: Bell },
 ]
 
