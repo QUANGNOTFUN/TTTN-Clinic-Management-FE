@@ -4,7 +4,6 @@ import {Card, CardContent, CardFooter, CardHeader, CardTitle,} from "@/component
 import {Button} from "@/components/ui/button"
 import {useState} from "react"
 import {CountdownCircleTimer} from "react-countdown-circle-timer"
-import {useCancelAppointmentRequest} from "@/lib/hooks/appointment-request/useCancelAppointmentRequest"
 import {AppointmentRequest} from "@/types/appointment-request";
 
 interface AppointmentRequestCardProps {
@@ -16,7 +15,7 @@ export function AppointmentRequestCard(props: AppointmentRequestCardProps) {
     const { appointment, onCancel } = props
     let targetTime = new Date(appointment.appointment_time).getTime()
     targetTime -= 30 * 60 * 1000 // 30 phút trước
-    const [timeLeft, setTimeLeft] = useState(targetTime - Date.now())
+    const [timeLeft] = useState(targetTime - Date.now())
     const totalDuration = 60 * 60
     
     const formatDateTime = (dateString: string) => {
