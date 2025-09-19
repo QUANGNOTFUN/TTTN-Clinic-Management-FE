@@ -1,25 +1,24 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { AppointmentRequest } from "@/types/appointment-request";
-import { format, isSameDay } from "date-fns";
-import { vi } from "date-fns/locale";
+import {useMemo, useState} from "react";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
+import {AppointmentRequest} from "@/types/appointment-request";
+import {format, isSameDay} from "date-fns";
+import {vi} from "date-fns/locale";
 import {
 	AdminAppointmentServiceSelect,
 } from "@/app/(admin)/appointment-request-manage/_component/appointmentRequesTable/AdminAppointmentServiceSelect";
 import {
 	AdminAppointmentDatePicker,
 } from "@/app/(admin)/appointment-request-manage/_component/appointmentRequesTable/AdminAppointmentDatePicker";
-import { ClinicService } from "@/types/clinic-service";
+import {ClinicService} from "@/types/clinic-service";
 
 interface AdminAppointmentRequestTableProps {
 	appointmentRequests: AppointmentRequest[] | undefined;
 	services: ClinicService[];
 	selectedDate: Date;
 	onDateChange: (date: Date) => void;
-	onSelectedServiceChange: (serviceId: string) => void;
 	onApprove: (id: string) => void;
 	onReject: (id: string) => void;
 	onEdit: (id: string) => void;
@@ -31,22 +30,12 @@ export function AdminAppointmentRequestTable(props: AdminAppointmentRequestTable
 		services,
 		selectedDate,
 		onDateChange,
-		onSelectedServiceChange,
 		onApprove,
 		onReject,
 		onEdit,
 	} = props;
-	const [selectedService, setSelectedService] = useState<string>("");
+	const [selectedService, setSelectedService] = useState<string>(services[0]?.id || "");
 	
-	// Sync initial selected service when services change
-	useEffect(() => {
-		if (services.length > 0 && !selectedService) {
-			setSelectedService(services[0].id); // Set default if no selection
-			onSelectedServiceChange(services[0].id); // Notify parent
-		}
-	}, [services]);
-	
-	// Filter appointments based on selected service and date, default to empty array if undefined
 	const filteredAppointments = useMemo(() => {
 		return (appointmentRequests ?? []).filter((req) => {
 			const matchesService = !selectedService || req.service_id === selectedService;
@@ -110,9 +99,8 @@ export function AdminAppointmentRequestTable(props: AdminAppointmentRequestTable
 					services={services}
 					onSelectedServiceChange={(serviceId) => {
 						setSelectedService(serviceId);
-						onSelectedServiceChange(serviceId);
 					}}
-					initialSelectedService={selectedService} // Pass current state
+					initialSelectedService={selectedService}
 				/>
 				<AdminAppointmentDatePicker
 					selectedDate={selectedDate}
@@ -123,7 +111,7 @@ export function AdminAppointmentRequestTable(props: AdminAppointmentRequestTable
 				{filteredAppointments.length === 0 ? (
 					<div className="text-center py-4 text-gray-500">Không có yêu cầu đặt lịch</div>
 				) : (
-					<Table className="w-full table-auto [&_td]:border [&_th]:border border-collapse text-center">
+					<Table className=" w-full table-auto [&_td]:border [&_th]:border border-collapse text-center">
 						<TableHeader className="bg-blue-50">
 							{table.getHeaderGroups().map((headerGroup) => (
 								<TableRow key={headerGroup.id} className="hover:bg-blue-100 transition-all duration-200">

@@ -20,7 +20,7 @@ export default function AdminDashBoardPage() {
     const { data: doctors } = useFindAllDoctors();
     const { data: patients } = useFindAllPatients();
     const { data: services } = useFindAllClinicServices();
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedDate] = useState(new Date());
     const { data: appointmentRequest } = useFindAllAppointmentRequestByDate(selectedDate);
     
     if (!doctors || !patients || !services || !appointmentRequest) {
@@ -36,8 +36,15 @@ export default function AdminDashBoardPage() {
         <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
             <div className="flex-1 flex flex-col w-full">
                 <main className="p-6 space-y-8">
-                    <StatsCardsSection doctors={doctors} patients={patients} services={services} appointmentRequest={appointmentRequest} />
-                    <AppointmentRequestSection services={services} appointmentRequest={appointmentRequest} />
+                    <StatsCardsSection
+                        doctors={doctors}
+                        patients={patients}
+                        services={services}
+                        appointmentRequest={appointmentRequest} />
+                    <AppointmentRequestSection
+                        services={services}
+                        appointmentRequest={appointmentRequest}
+                    />
                 </main>
             </div>
         </div>

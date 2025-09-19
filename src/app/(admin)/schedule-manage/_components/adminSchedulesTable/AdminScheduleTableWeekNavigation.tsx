@@ -19,7 +19,7 @@ interface AdminScheduleTableWeekNavigationProps {
 export function AdminScheduleTableWeekNavigation(props: AdminScheduleTableWeekNavigationProps) {
 	const { selectedDate, onDateChange, weekRange, handlePreviousWeek, handleNextWeek } = props;
 	// Memoize weekDates to avoid recomputation if needed
-	const weekDates = useMemo(() => {
+	useMemo(() => {
 		const dates = [];
 		let currentDate = subWeeks(selectedDate, 0);
 		for (let i = 0; i < 7; i++) {

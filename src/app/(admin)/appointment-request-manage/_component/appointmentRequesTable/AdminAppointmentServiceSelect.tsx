@@ -1,7 +1,7 @@
 "use client";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useEffect, useState } from "react";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {useState} from "react";
 
 interface AdminAppointmentServiceSelectProps {
 	services: { id: string; name: string }[];
@@ -12,17 +12,7 @@ interface AdminAppointmentServiceSelectProps {
 export function AdminAppointmentServiceSelect(props: AdminAppointmentServiceSelectProps) {
 	const { services, onSelectedServiceChange, initialSelectedService } = props;
 	
-	const [selectedService, setSelectedService] = useState("");
-	
-	// Sync with initialSelectedService when it changes
-	useEffect(() => {
-		if (initialSelectedService) {
-			setSelectedService(initialSelectedService);
-		} else if (services.length > 0 && !selectedService) {
-			setSelectedService(services[0].id); // Set default only if no selection
-			onSelectedServiceChange(services[0].id);
-		}
-	}, [initialSelectedService, services]);
+	const [selectedService, setSelectedService] = useState(initialSelectedService ?? "");
 	
 	const handleValueChange = (value: string) => {
 		setSelectedService(value);

@@ -1,7 +1,7 @@
 import {ClinicService} from "@/types/clinic-service";
 import {Doctor} from "@/types/doctor";
 import {Patient} from "@/types/patient";
-import {Calendar, FileText, Stethoscope, Users, Users2Icon} from "lucide-react";
+import {Calendar, Stethoscope, Users, Users2Icon} from "lucide-react";
 import {AppointmentRequest} from "@/types/appointment-request";
 
 type SectionStatsCardsProps = {
