@@ -1,91 +1,31 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import React, { useState, useEffect } from "react";
-import { enqueueSnackbar } from "notistack";
+import React, { useState } from "react";
+import {toast} from "react-toastify";
 
-const SEND_OTP_MUTATION = gql`
-  mutation ForgotPassword($email: String!) {
-    forgotPassword(email: $email)
-  }
-`;
-
-const RESET_PASSWORD_MUTATION = gql`
-  mutation ResetPassword($input: ResetPasswordInput!) {
-    resetPassword(input: $input)
-  }
-`;
+// Định nghĩa form data
+type EmailFormValues = { email: string };
+type ResetFormValues = { otp: string; newPassword: string };
 
 export default function ForgetPasswordPage() {
     const {
         register,
         handleSubmit,
         formState: { errors },
-        reset,
-    } = useForm();
-
+    } = useForm<EmailFormValues & ResetFormValues>();
+    
     const [step, setStep] = useState<"EMAIL" | "RESET">("EMAIL");
-    const [countdown, setCountdown] = useState(0);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [email, setEmail] = useState("");
-
-    useEffect(() => {
-        let timer: NodeJS.Timeout;
-        if (countdown > 0) {
-            timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-        }
-        return () => clearTimeout(timer);
-    }, [countdown]);
-
-    const handleSendOtp = async (data: any) => {
-        setIsSubmitting(true);
-        try {
-            const res = await sendOtp({ variables: { email: data.email } });
-            if (res.data?.forgotPassword) {
-                enqueueSnackbar("Mã OTP đã được gửi về email!", { variant: "success" });
-                setEmail(data.email);
-                setStep("RESET");
-                setCountdown(60);
-            } else {
-                enqueueSnackbar("Không thể gửi mã OTP. Vui lòng thử lại.", { variant: "error" });
-            }
-        } catch (error) {
-            enqueueSnackbar("Lỗi hệ thống khi gửi OTP.", { variant: "error" });
-        } finally {
-            setIsSubmitting(false);
+    
+    // Giả lập chuyển step khi submit
+    const onSubmit = () => {
+        if (step === "EMAIL") {
+            setStep("RESET");
+        } else {
+            toast.info("Chức năng đang được phát triển, vui lòng quay lại sau!");
         }
     };
-
-    const handleResetPassword = async (data: any) => {
-        setIsSubmitting(true);
-        try {
-            const res = await resetPassword({
-                variables: {
-                    input: {
-                        email: email,
-                        otp: data.otp,
-                        newPassword: data.newPassword,
-                    },
-                },
-            });
-            if (res.data?.resetPassword) {
-                enqueueSnackbar("Đặt lại mật khẩu thành công!", { variant: "success" });
-                reset();
-                window.location.href = "/login";
-            } else {
-                enqueueSnackbar("Mã OTP không hợp lệ hoặc đã hết hạn.", { variant: "error" });
-            }
-        } catch (error: any) {
-            const errorMessage =
-                error.message.includes("Mã xác nhận không đúng")
-                    ? "Mã OTP không hợp lệ hoặc đã hết hạn."
-                    : "Lỗi hệ thống khi đặt lại mật khẩu.";
-            enqueueSnackbar(errorMessage, { variant: "error" });
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
+    
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4">
             <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg space-y-6">
@@ -93,16 +33,17 @@ export default function ForgetPasswordPage() {
                     {step === "EMAIL" ? "Quên Mật Khẩu" : "Đặt Lại Mật Khẩu"}
                 </h2>
                 <p className="text-sm text-center text-gray-500">
-                    {step === "EMAIL" ? "Nhập email để nhận mã OTP" : "Nhập mã OTP và mật khẩu mới"}
+                    {step === "EMAIL"
+                        ? "Nhập email để nhận mã OTP"
+                        : "Nhập mã OTP và mật khẩu mới"}
                 </p>
-
-                <form
-                    onSubmit={handleSubmit(step === "EMAIL" ? handleSendOtp : handleResetPassword)}
-                    className="space-y-4"
-                >
+                
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     {step === "EMAIL" && (
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Email</label>
+                            <label className="block text-sm font-medium text-gray-700">
+                                Email
+                            </label>
                             <input
                                 type="email"
                                 {...register("email", {
@@ -118,15 +59,19 @@ export default function ForgetPasswordPage() {
                                 placeholder="Nhập email của bạn"
                             />
                             {errors.email && (
-                                <p className="text-sm text-red-600 mt-1">{String(errors.email.message)}</p>
+                                <p className="text-sm text-red-600 mt-1">
+                                    {errors.email.message}
+                                </p>
                             )}
                         </div>
                     )}
-
+                    
                     {step === "RESET" && (
                         <>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Mã OTP</label>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Mã OTP
+                                </label>
                                 <input
                                     type="text"
                                     {...register("otp", { required: "Mã OTP là bắt buộc" })}
@@ -136,11 +81,15 @@ export default function ForgetPasswordPage() {
                                     placeholder="Nhập mã OTP"
                                 />
                                 {errors.otp && (
-                                    <p className="text-sm text-red-600 mt-1">{String(errors.otp.message)}</p>
+                                    <p className="text-sm text-red-600 mt-1">
+                                        {errors.otp.message}
+                                    </p>
                                 )}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Mật Khẩu Mới</label>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Mật Khẩu Mới
+                                </label>
                                 <input
                                     type="password"
                                     {...register("newPassword", {
@@ -156,31 +105,26 @@ export default function ForgetPasswordPage() {
                                     placeholder="Nhập mật khẩu mới"
                                 />
                                 {errors.newPassword && (
-                                    <p className="text-sm text-red-600 mt-1">{String(errors.newPassword.message)}</p>
+                                    <p className="text-sm text-red-600 mt-1">
+                                        {errors.newPassword.message}
+                                    </p>
                                 )}
                             </div>
                         </>
                     )}
-
+                    
                     <button
                         type="submit"
-                        disabled={isSubmitting || (step === "EMAIL" && countdown > 0)}
-                        className={`w-full py-2 px-4 rounded-lg text-white transition ${
-                            isSubmitting || (step === "EMAIL" && countdown > 0)
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-blue-600 hover:bg-blue-700"
-                        }`}
+                        className="w-full py-2 px-4 rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition"
                     >
-                        {isSubmitting
-                            ? "Đang xử lý..."
-                            : step === "EMAIL"
-                                ? countdown > 0
-                                    ? `Gửi lại sau ${countdown}s`
-                                    : "Gửi Mã OTP"
-                                : "Đặt Lại Mật Khẩu"}
+                        {step === "EMAIL" ? "Gửi Mã OTP" : "Đặt Lại Mật Khẩu"}
                     </button>
+                    
                     <p className="text-center text-sm">
-                        Đã có tài khoản? <a href="/login" className="text-blue-600 hover:underline">Đăng nhập</a>
+                        Đã có tài khoản?{" "}
+                        <a href="/login" className="text-blue-600 hover:underline">
+                            Đăng nhập
+                        </a>
                     </p>
                 </form>
             </div>

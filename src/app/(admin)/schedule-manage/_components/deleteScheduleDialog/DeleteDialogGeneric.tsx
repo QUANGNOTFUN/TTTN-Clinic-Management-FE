@@ -4,22 +4,27 @@ import {X} from "lucide-react";
 
 interface DeletableItem {
 	id: string;
-	[key: string]: any;
+	name?: string;
+	full_name?: string;
 }
 
 type DeleteDialogGenericProps<T extends DeletableItem> = {
 	item: T;
 	title?: string;
 	description?: string;
-	idKey?: string;
+	idKey?: keyof T; // 👈 an toàn hơn string
 	onAction: (id: string) => void;
 	onClose?: () => void;
 };
 
+
 export function DeleteDialogGeneric<T extends DeletableItem>(props: DeleteDialogGenericProps<T>) {
 	const { item, title = "Xác Nhận Xóa", description, idKey = "id", onAction, onClose } = props;
 	const handleDelete = () => {
-		onAction(item[idKey as keyof T]);
+		const idValue = item[idKey];
+		if (typeof idValue === "string") {
+			onAction(idValue);
+		}
 		if (onClose) onClose();
 	};
 	
