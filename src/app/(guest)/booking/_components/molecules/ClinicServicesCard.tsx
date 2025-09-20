@@ -30,20 +30,20 @@ export function ClinicServicesCard(props: ClinicServicesCardType) {
 			{url_image && (
 				<div
 					className={`
-			            relative mb-4
-			            ${isSelected ? "w-full h-[50%]" : "w-20 h-20"}
-			        `}
+					    relative mb-4
+					    ${isSelected ? "w-full h-[300px]" : "w-20 h-20"}
+					  `}
 				>
 					<Image
 						src={GET_IMAGE_API(item.image_url)}
 						alt={item?.name || "Logo dịch vụ"}
 						fill
-						className={`object-cover ${isSelected && "rounded-xl"} hidden sm:block`}
+						className={`object-cover ${isSelected ? "rounded-xl" : "rounded-md"}`}
 						sizes={isSelected ? "60vw" : "80px"}
 						priority={isSelected}
 					/>
-				
 				</div>
+			
 			)}
 			
 			{/* Name Clinic Service */}
