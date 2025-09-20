@@ -28,7 +28,7 @@ export function ServiceCardHome(props: ServiceCardProps) {
     const [imageError, setImageError] = useState(false);
     
     const imageSrc =
-        url_image && !imageError ? GET_IMAGE_API(url_image) : "/placeholder.png";
+        url_image && !imageError ? GET_IMAGE_API(url_image) : "https://placehold.co/600x400";
     
     const gradient = gradients[index % gradients.length];
     

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import {ClinicService} from "@/types/clinic-service";
+import {GET_IMAGE_API} from "@/lib/api/image";
 
 export type ClinicServicesCardType = {
 	className: string;
@@ -10,6 +11,9 @@ export type ClinicServicesCardType = {
 
 export function ClinicServicesCard(props: ClinicServicesCardType) {
 	const { className, url_image, item, isSelected } = props;
+	
+	const imgUrl = url_image
+		? GET_IMAGE_API(url_image) : "https://placehold.co/600x400"
 	
 	return (
 		<div
@@ -34,7 +38,7 @@ export function ClinicServicesCard(props: ClinicServicesCardType) {
 			        `}
 				>
 					<Image
-						src={url_image}
+						src={imgUrl}
 						alt={item?.name || "Logo dịch vụ"}
 						fill
 						className={`object-cover ${isSelected && "rounded-xl"} hidden sm:block`}

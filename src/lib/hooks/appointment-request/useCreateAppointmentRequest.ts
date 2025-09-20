@@ -32,7 +32,7 @@ export function useCreateAppointmentRequest() {
 		onSuccess: () => {
 			toast.success("Tạo yêu cầu thành công", { toastId: "create-appointment-request-success" });
 		},
-		onError: (error) => {
+		onError: (error: AxiosError<>) => {
 			toast.error(error?.message, { toastId: "create-appointment-request-error" });
 		},
 	});

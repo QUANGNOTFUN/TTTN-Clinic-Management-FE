@@ -49,7 +49,7 @@ export default function BookingPage() {
                 {isSelected && (
                     <ClinicServicesCard
                         className="w-[80%] h-[6vh] md:h-[80vh] max-h-[800px]"
-                        url_image={"https://sdmntpraustraliaeast.oaiusercontent.com/files/00000000-39f4-61fa-a38d-f1f082280c0d/raw?se=2025-09-03T22%3A16%3A15Z&sp=r&sv=2024-08-04&sr=b&scid=b5071798-c451-5704-8159-8598392bb00e&skoid=cb94e22a-e3df-4e6a-9e17-1696f40fa435&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-09-03T19%3A16%3A31Z&ske=2025-09-04T19%3A16%3A31Z&sks=b&skv=2024-08-04&sig=7Niu/%2Bl4b0YDL11R/SkSX7%2B/QZWlZfZNzfJFpNlI/7I%3D"}
+                        url_image={data.find((s) => s.id === isSelected).image_url || data[0].image_url}
                         item={data.find((s) => s.id === isSelected) || data[0]}
                         isSelected={true}
                     />
@@ -96,7 +96,10 @@ export default function BookingPage() {
                                         transition={{ type: "spring", stiffness: 100 }}
                                         onClick={() => setSelected(service.id)}
                                     >
-                                        <ClinicServicesCard className="w-full h-15 md:h-25 cursor-pointer" item={service} />
+                                        <ClinicServicesCard
+                                            className="w-full h-15 md:h-25 cursor-pointer"
+                                            item={service}
+                                        />
                                     </motion.div>
                                 </SwiperSlide>
                             ))}

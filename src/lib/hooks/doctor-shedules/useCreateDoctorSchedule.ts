@@ -3,7 +3,7 @@
 import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { CREATE_DOCTOR_SCHEDULE } from '@/lib/api/doctor-schedule';
-import { CustomSession } from '@/types/login';
+import {ApiErrorResponse, CustomSession} from '@/types/login';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
 import { CreateDoctorScheduleDto } from '@/app/(admin)/schedule-manage/_components/createScheduleForm/CreateScheduleForm';
@@ -16,7 +16,10 @@ export const useCreateDoctorSchedule = () => {
 		mutationFn: async (payload: CreateDoctorScheduleDto) => {
 			if (!session?.access_token) throw new Error('Not authenticated');
 			
-			const res = await axios.post(CREATE_DOCTOR_SCHEDULE, payload, {
+			const res = await axios.post(
+				CREATE_DOCTOR_SCHEDULE,
+				payload,
+				{
 				headers: {
 					Authorization: `Bearer ${session?.access_token}`,
 				},
@@ -28,7 +31,7 @@ export const useCreateDoctorSchedule = () => {
 		onSuccess: () => {
 			toast.success('Tạo lịch hẹn thành công', { toastId: 'create-doctor-schedule-success' });
 		},
-		onError: (error: AxiosError) => {
+		onError: (error: AxiosError<ApiErrorResponse>) => {
 			toast.error(error.message, { toastId: 'create-doctor-schedule-error' });
 		},
 	});
