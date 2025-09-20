@@ -31,15 +31,16 @@ export function ClinicServicesCard(props: ClinicServicesCardType) {
 				<div
 					className={`
 					    relative mb-4
-					    ${isSelected ? "w-full h-[300px]" : "w-20 h-20"}
-					  `}
+					    ${isSelected ? "w-full h-auto aspect-[4/3]" : "w-20 h-20"}
+				    `}
 				>
-					<Image
+				
+				<Image
 						src={GET_IMAGE_API(item.image_url)}
 						alt={item?.name || "Logo dịch vụ"}
 						fill
 						className={`object-cover ${isSelected ? "rounded-xl" : "rounded-md"}`}
-						sizes={isSelected ? "60vw" : "80px"}
+						sizes={"(max-width: 640px) 90vw, (max-width: 1024px) 50vw, 400px"}
 						priority={isSelected}
 					/>
 				</div>
