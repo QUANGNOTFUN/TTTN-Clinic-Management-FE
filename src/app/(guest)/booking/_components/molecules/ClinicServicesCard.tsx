@@ -12,9 +12,6 @@ export type ClinicServicesCardType = {
 export function ClinicServicesCard(props: ClinicServicesCardType) {
 	const { className, url_image, item, isSelected } = props;
 	
-	const imgUrl = url_image
-		? GET_IMAGE_API(url_image) : "https://placehold.co/600x400"
-	
 	return (
 		<div
 			className={`
@@ -38,7 +35,7 @@ export function ClinicServicesCard(props: ClinicServicesCardType) {
 			        `}
 				>
 					<Image
-						src={imgUrl}
+						src={GET_IMAGE_API(item.image_url)}
 						alt={item?.name || "Logo dịch vụ"}
 						fill
 						className={`object-cover ${isSelected && "rounded-xl"} hidden sm:block`}
