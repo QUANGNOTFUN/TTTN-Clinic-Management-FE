@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "tttn-clinic-management-be.onrender.com",
-        pathname: "/uploads/**", // cho phép lấy ảnh trong thư mục uploads
+        pathname: "/uploads/**",
       },
     ],
   },

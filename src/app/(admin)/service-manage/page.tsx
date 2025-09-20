@@ -54,8 +54,8 @@ export default function ServiceManagePage () {
 			accessorKey: 'image_url', header: 'Ảnh',
 			cell: ({ row }) => {
 				const imageUrl = row.original.image_url
-					? `${GET_IMAGE_API(row.original.image_url)}`
-					: 'https://placehold.co/600x400';
+					? GET_IMAGE_API(row.original.image_url)
+					: "https://placehold.co/600x400"; // fallback
 				return (
 					<div className="flex items-center justify-center">
 						<Image

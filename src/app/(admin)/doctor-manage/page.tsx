@@ -50,8 +50,8 @@ export default function DoctorManagePage() {
 			accessorKey: 'image_url', header: 'Ảnh',
 			cell: ({ row }) => {
 				const imageUrl = row.original.avatar_url
-					? `${GET_IMAGE_API(row.original.avatar_url)}`
-					: 'https://placehold.co/600x400';
+					? GET_IMAGE_API(row.original.avatar_url)
+					: "https://placehold.co/600x400"; // fallback
 				return (
 					<div className="flex items-center justify-center">
 						<Image
@@ -60,7 +60,7 @@ export default function DoctorManagePage() {
 							width={100}
 							height={100}
 							className="object-cover rounded-lg"
-							onError={() => 'https://placehold.co/600x400'}
+							onError={() => "https://placehold.co/600x400"}
 						/>
 					</div>
 				);
