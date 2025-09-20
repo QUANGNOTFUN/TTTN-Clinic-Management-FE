@@ -13,9 +13,9 @@ const nextConfig: NextConfig = {
         hostname: "placehold.co",
       },
       {
-        protocol: 'https',
-        hostname: 'your-service.onrender.com', // domain API/DB trả ảnh
-        pathname: '/uploads/*',               // hoặc '/*' nếu không chắc
+        protocol: "https",
+        hostname: "tttn-clinic-management-be.onrender.com",
+        pathname: "/uploads/**", // cho phép lấy ảnh trong thư mục uploads
       },
     ],
   },
