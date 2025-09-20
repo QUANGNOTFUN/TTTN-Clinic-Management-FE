@@ -110,8 +110,8 @@ export default function ProfilePage() {
             <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6">
                 {/* Header */}
                 <div className="relative flex flex-col md:flex-row items-center gap-6 bg-white p-6 rounded-2xl shadow">
-                    <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-md">
-                        <Avatar className="w-10 h-10 lg:w-14 lg:h-14 border shadow-sm">
+                    <div className="relative w-32 h-32 rounded-full overflow-hidden  border-gray-200 shadow-md">
+                        <Avatar className="w-full h-full border shadow-sm">
                             <AvatarImage
                                 src={
                                     data?.avatar_url
@@ -121,11 +121,12 @@ export default function ProfilePage() {
                                 className="w-full h-full object-cover rounded-full"
                                 alt="Avatar"
                             />
-                            <AvatarFallback>
+                            <AvatarFallback className="text-2xl flex items-center justify-center w-full h-full">
                                 {data?.full_name?.charAt(0) ?? "?"}
                             </AvatarFallback>
                         </Avatar>
                     </div>
+                    
                     {/* Name and email */}
                     <div className="text-center md:text-left space-y-2">
                         <h1 className="text-3xl md:text-2xl font-bold text-gray-800">

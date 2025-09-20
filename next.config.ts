@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "placehold.co",
       },
+      {
+        protocol: 'https',
+        hostname: 'your-service.onrender.com', // domain API/DB trả ảnh
+        pathname: '/uploads/*',               // hoặc '/*' nếu không chắc
+      },
     ],
   },
   webpack(config) {
