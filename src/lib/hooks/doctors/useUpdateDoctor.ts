@@ -1,10 +1,10 @@
 import {useMutation} from "@tanstack/react-query";
-import {UpdateDoctorDto} from "@/types/doctor";
 import axios, {AxiosError} from "axios";
 import {UPDATE_DOCTOR_API_URL} from "@/lib/api/doctor";
 import { useSession } from "next-auth/react";
 import { CustomSession } from "@/types/login";
 import {toast} from "react-toastify";
+import {UpdateDoctorDto} from "@/app/(admin)/doctor-manage/_components/updateDoctorForm/updateDoctorForm";
 
 export function useUpdateDoctor() {
 	const { data: session } = useSession() as { data: CustomSession | null };
@@ -15,8 +15,6 @@ export function useUpdateDoctor() {
 			id: string;
 			payload: UpdateDoctorDto;
 		}) => {
-			if (!session?.access_token) throw new Error("Not authenticated");
-			
 			const res = await axios.put(
 				UPDATE_DOCTOR_API_URL(id),
 				payload, {

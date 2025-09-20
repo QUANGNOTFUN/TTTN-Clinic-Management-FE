@@ -6,16 +6,21 @@ import Image from "next/image";
 import {useSession} from "next-auth/react";
 import {CustomSession} from "@/types/login";
 import {Button} from "@/components/ui/button";
-import {Edit3Icon} from "lucide-react";
+import {Edit3Icon, ImageUpIcon} from "lucide-react";
 import {useState} from "react";
 import {ProfileUpdateForm} from "@/app/(user)/profile/_component/ProfileUpdateForm";
 import {useUpdatePatient} from "@/lib/hooks/patients/useUpdatePatient";
+import {useUpdatePatientImage} from "@/lib/hooks/image/useUpdatePatientImage";
+import {GenericUpdateImageForm} from "@/app/(admin)/_components/mocules/GenericUpdateImageForm";
+import {GET_IMAGE_API} from "@/lib/api/image";
 
 export default function ProfilePage() {
     const { data: session } = useSession() as { data: CustomSession };
     const { data, isLoading, isError, error, refetch } = useFindOnePatient();
     const [isEdit, setIsEdit] = useState<boolean>(false);
+    const [isUpload, setIsUpload] = useState<boolean>(false);
     const { mutateAsync: updatePatient } = useUpdatePatient();
+    const { mutateAsync: uploadImage, isPending } = useUpdatePatientImage();
     
     const translateGender = (gender?: string | null) => {
         switch (gender?.toUpperCase()) {
@@ -23,8 +28,8 @@ export default function ProfilePage() {
                 return "Nam";
             case "FEMALE":
                 return "Nữ";
-            case "OTHER":
-                return "Khác";
+            case "UNKNOWN":
+                return "Chưa cập nhật";
             default:
                 return "N/A";
         }
@@ -70,6 +75,20 @@ export default function ProfilePage() {
             />
         );
     }
+    if (isUpload) {
+        return (
+            <GenericUpdateImageForm
+                entityId={session.user.id}
+                entityName={data?.full_name || "N/A"}
+                isPending={isPending}
+                onClose={() => setIsUpload(false)}
+                onUpdate={(data) => {
+                    uploadImage({patientId: session.user.id, image: data.image}).then(() => refetch())
+                }}
+            />
+        )
+    }
+    
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-zinc-100">
@@ -93,12 +112,18 @@ export default function ProfilePage() {
                 <div className="relative flex flex-col md:flex-row items-center gap-6 bg-white p-6 rounded-2xl shadow">
                     <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-md">
                         <Image
-                            src="/default-avatar.png"
+                            src={
+                                data?.avatar_url
+                                    ? GET_IMAGE_API(data?.avatar_url)
+                                    : "/default-avatar.png"
+                            }
                             alt="Avatar"
                             fill
                             className="object-cover"
                         />
+                        
                     </div>
+                    {/* Name and email */}
                     <div className="text-center md:text-left space-y-2">
                         <h1 className="text-3xl md:text-2xl font-bold text-gray-800">
                             {session?.user.email || "Chưa cập nhật tên"}
@@ -107,6 +132,17 @@ export default function ProfilePage() {
                             {"User_Id: " + data?.user_id || "Chưa cập nhật email"}
                         </p>
                     </div>
+                    
+                    {/* Upload button */}
+                    <Button
+                        onClick={() => setIsUpload(!isEdit)}
+                        className="absolute top-13 right-2 cursor-pointer bg-emerald-300 hover:bg-emerald-600 text-zinc-700 hover:text-zinc-50"
+                    >
+                        <ImageUpIcon />
+                        <span>Cập nhật ảnh</span>
+                    </Button>
+                    
+                    {/* Edit button */}
                     <Button
                         onClick={() => setIsEdit(!isEdit)}
                         className="absolute top-2 right-2 cursor-pointer bg-emerald-300 hover:bg-emerald-600 text-zinc-700 hover:text-zinc-50"

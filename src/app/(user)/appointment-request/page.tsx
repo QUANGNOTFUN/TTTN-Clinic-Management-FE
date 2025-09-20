@@ -15,7 +15,7 @@ import {CustomSession} from "@/types/login";
 import {AppointmentRequest} from "@/types/appointment-request";
 import {useCancelAppointmentRequest} from "@/lib/hooks/appointment-request/useCancelAppointmentRequest";
 
-export default function AppointmentPage() {
+export default function AppointmentsRequestPage() {
     const { data: session } = useSession() as { data: CustomSession };
     const { data, isLoading, isError, error, refetch } = useFindAllAppointmentRequestById(session?.user.id);
     const { mutateAsync: cancelAppointment } = useCancelAppointmentRequest();
@@ -60,7 +60,7 @@ export default function AppointmentPage() {
         return (
             <div className="flex flex-col w-full h-screen items-center justify-center text-gray-500">
                 <CalendarX2 className="h-12 w-12 mb-3 text-gray-400" />
-                <p className="text-lg font-medium">Không có lịch khám nào</p>
+                <p className="text-lg font-medium">Không có lịch hẹn nào</p>
             </div>
         );
     }

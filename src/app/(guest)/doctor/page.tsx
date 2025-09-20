@@ -93,8 +93,8 @@ export default function DoctorPage() {
           
           {/* Result Count */}
           {(searchTerm || specialtyFilter !== ALL_OPTION) && (
-              <div className="mb-8 text-center">
-                <p className="text-gray-600 dark:text-gray-300 text-lg font-medium">
+              <div className="mb-2 text-center">
+                <p className="text-gray-600 dark:text-gray-300 text-sm font-medium">
                   Tìm thấy <span className="text-blue-600 dark:text-blue-400 font-bold">{filteredDoctors.length}</span> bác sĩ
                 </p>
               </div>

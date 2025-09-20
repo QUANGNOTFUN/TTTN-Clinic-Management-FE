@@ -22,6 +22,9 @@ import {
 	DeleteClinicServiceDialog
 } from "@/app/(admin)/service-manage/_component/deleteClinicServiceDialog/DeleteClinicServiceDialog";
 import {useDeleteClinicService} from "@/lib/hooks/clinic-services/useDeleteClinicService";
+import {UpdateImageForm} from "@/app/(admin)/service-manage/_component/updateImageForm/UpdateImageForm";
+import Image from "next/image";
+import {GET_IMAGE_API} from "@/lib/api/image";
 
 export default function ServiceManagePage () {
 	const { data: services = [], refetch } = useFindAllClinicServices();
@@ -31,19 +34,42 @@ export default function ServiceManagePage () {
 	const [ isActionOpen, setIsActionOpen ] = useState<string>();
 	const [ selectedServiceId, setSelectedServiceId ] = useState<string>();
 	
-	const handleAction = (patientId: string, action: string) => {
+	const handleAction = (serviceId: string, action: string) => {
 		if (action === "edit") {
-			setSelectedServiceId(patientId);
+			setSelectedServiceId(serviceId);
 			setIsActionOpen(action);
 		} else if (action === "delete") {
-			setSelectedServiceId(patientId);
+			setSelectedServiceId(serviceId);
 			setIsActionOpen(action);
+		} else if (action === "upload-image") {
+			setIsActionOpen(action);
+			setSelectedServiceId(serviceId);
 		}
 	};
 	
 	const columns: ColumnDef<ClinicService>[] = [
 		{ id: "index", header: "STT", cell: (info) => info.row.index + 1, },
 		{ accessorKey: "id", header: "ID", },
+		{
+			accessorKey: 'image_url', header: 'Ảnh',
+			cell: ({ row }) => {
+				const imageUrl = row.original.image_url
+					? `${GET_IMAGE_API(row.original.image_url)}`
+					: 'https://placehold.co/600x400';
+				return (
+					<div className="flex items-center justify-center">
+						<Image
+							src={imageUrl}
+							alt="Service Preview"
+							width={100}
+							height={100}
+							className="object-cover rounded-lg"
+							onError={() => 'https://placehold.co/600x400'}
+						/>
+					</div>
+				);
+			}
+		},
 		{ accessorKey: "name", header: "Tên dịch vụ", },
 		{ accessorKey: "description", header: "Mô tả", },
 		{ accessorKey: "price", header: "Mức giá", },
@@ -77,6 +103,9 @@ export default function ServiceManagePage () {
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent>
+						<DropdownMenuItem className={"cursor-pointer"} onClick={() => handleAction(String(info.row.original.id), "upload-image")}>
+							Cập nhật ảnh
+						</DropdownMenuItem>
 						<DropdownMenuItem className={"cursor-pointer"} onClick={() => handleAction(String(info.row.original.id), "edit")}>
 							Sửa
 						</DropdownMenuItem>
@@ -132,6 +161,18 @@ export default function ServiceManagePage () {
 				}}
 			/>
 		)
+	} else if (isActionOpen === "upload-image") {
+		const foundService = services.find((s) => s.id === selectedServiceId);
+		return (
+			<UpdateImageForm
+				service={foundService}
+				onClose={() => {
+					setSelectedServiceId(null);
+					setIsActionOpen(null);
+					refetch().then();
+				}}
+			/>
+		);
 	}
 	
 	if (createLoading || updateLoading || deleteLoading) return <Loader className={"animate-spin"}/>;

@@ -2,8 +2,9 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { FiStar } from 'react-icons/fi';
-import { Doctor } from '@/types/doctor';
+import {Doctor} from '@/types/doctor';
+import {GET_IMAGE_API} from "@/lib/api/image";
+import {ArrowRight, MapPin, Star, Stethoscope} from "lucide-react";
 
 const NO_SPECIALTY = 'Chưa cập nhật';
 
@@ -15,36 +16,42 @@ export function DoctorCard({ doctor }: DoctorCardProps) {
 	const specialtyName = doctor.specialty ?? NO_SPECIALTY;
 	
 	return (
-		<div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 ease-out">
-			<div className="flex justify-center mb-4">
-				<div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-blue-100 dark:border-blue-900">
+		<div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 ease-out">
+			<div
+				key={doctor.user_id}
+				className="snap-start flex-shrink-0 w-64 sm:w-auto group bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
+			>
+				<div className="relative h-[40vh] w-full">
 					<Image
-						src={doctor.avatar_url || '/default-avatar.png'}
-						alt={doctor.full_name || 'Bác sĩ'}
+						src={
+							doctor.avatar_url
+								? GET_IMAGE_API(doctor.avatar_url)
+								: "https://placehold.co/600x400"
+						}
+						alt={doctor.full_name}
 						fill
 						className="object-cover"
-						sizes="96px"
 					/>
+					<div className="absolute top-3 right-3 bg-white/80 dark:bg-gray-700 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1">
+						<Star className="text-yellow-500 w-3.5 h-3.5" />
+						{doctor.rating}
+					</div>
 				</div>
-			</div>
-			
-			<h3 className="text-lg font-bold text-gray-800 dark:text-white text-center mb-3 truncate">
-				{doctor.full_name || 'Chưa cập nhật tên'}
-			</h3>
-			
-			<div className="flex items-center justify-center mb-4">
-				<FiStar className="text-yellow-400 w-5 h-5 mr-1" />
-				<span className="text-gray-700 dark:text-gray-300 font-semibold">
-          {doctor.rating ? doctor.rating.toFixed(1) : 'Chưa có đánh giá'}
-        </span>
-			</div>
-			
-			<div className="flex flex-wrap gap-2 justify-center">
-        <span
-	        className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-medium px-3 py-1 rounded-full"
-        >
-          {specialtyName}
-        </span>
+				<div className="p-4">
+					<h3 className="text-base font-bold text-gray-800 dark:text-gray-100 group-hover:text-teal-600 truncate">
+						{doctor.full_name}
+					</h3>
+					<p className="flex items-center gap-2 text-teal-600 dark:text-teal-400 mt-2 text-sm truncate">
+						<Stethoscope className="w-4 h-4" /> {specialtyName}
+					</p>
+					<p className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mt-1 text-xs truncate">
+						<MapPin className="w-4 h-4" /> {doctor.phone_number}
+					</p>
+					<button className="mt-4 w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-lg font-semibold shadow-sm hover:opacity-90 transition text-sm">
+						Xem chi tiết
+						<ArrowRight className="w-4 h-4" />
+					</button>
+				</div>
 			</div>
 		</div>
 	);

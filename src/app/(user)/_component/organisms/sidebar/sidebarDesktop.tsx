@@ -6,12 +6,13 @@ import { useFindOnePatient } from "@/lib/hooks/patients/useFindOnePatient"
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {GET_IMAGE_API} from "@/lib/api/image";
 
 // Nav items
 const navItems = [
 	{ href: "/profile", label: "Thông tin cá nhân", icon: Contact },
-	{ href: "/appointment", label: "Lịch hẹn", icon: Calendar },
-	{ href: "/", label: "Lịch sử khám", icon: BookMarked },
+	{ href: "/appointment-request", label: "Lịch hẹn", icon: Calendar },
+	{ href: "/appointment", label: "Lịch khám", icon: BookMarked },
 	{ href: "/notifications", label: "Thông báo", icon: Bell },
 ]
 
@@ -40,8 +41,16 @@ export default function SidebarDesktop() {
 			<Card className="w-full h-full flex flex-col rounded-none shadow-none border-0">
 				{/* Header: User Info */}
 				<CardHeader className="flex flex-row items-center gap-3">
-					<Avatar className="w-12 h-12 lg:w-14 lg:h-14 border shadow-sm">
-						<AvatarImage src="/default-avatar.png" alt="Avatar" />
+					<Avatar className="w-10 h-10 lg:w-14 lg:h-14 border shadow-sm">
+						<AvatarImage
+							src={
+								data?.avatar_url
+									? GET_IMAGE_API(data?.avatar_url)
+									: "/default-avatar.png"
+							}
+							className="w-full h-full object-cover rounded-full"
+							alt="Avatar"
+						/>
 						<AvatarFallback>
 							{data?.full_name?.charAt(0) ?? "?"}
 						</AvatarFallback>

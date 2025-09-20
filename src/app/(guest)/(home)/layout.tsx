@@ -1,5 +1,5 @@
 import React from "react";
-import Footer from "@/components/footer/Footer";
+import Footer from "@/app/(guest)/(home)/_component/footer/Footer";
 
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
     return (

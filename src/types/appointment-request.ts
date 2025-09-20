@@ -3,6 +3,7 @@ export type CreateAppointmentRequestDto = {
 	phone_number: string;
 	patient_id: string;
 	service_id: string;
+	doctor_id?: string;
 	appointment_time: string;
 };
 

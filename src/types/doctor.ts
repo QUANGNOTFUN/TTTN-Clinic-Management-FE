@@ -13,18 +13,15 @@ export type Doctor = {
 		email: string;
 		is_active: boolean;
 	};
+	services: {
+		id: string;
+		name: string;
+		is_active: boolean;
+	}[];
 };
 
 export type CreateDoctorDto = {
 	full_name: string;
 	email: string;
 	password: string;
-}
-
-export type UpdateDoctorDto = {
-	full_name: string;
-	gender: string;
-	phone_number: string;
-	specialty: string;
-	bio: string;
 }

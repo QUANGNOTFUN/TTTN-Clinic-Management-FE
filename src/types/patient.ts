@@ -3,6 +3,7 @@ export type Patient = {
 	full_name?: string | null;
 	gender?: string | null;
 	date_of_birth?: string | null;
+	avatar_url?: string | null;
 	medical_history?: string | null;
 	address?: string | null;
 	phone_number?: string | null;

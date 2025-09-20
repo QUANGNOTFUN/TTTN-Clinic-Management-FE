@@ -4,6 +4,7 @@ import axios from "axios";
 import {useSession} from "next-auth/react";
 import {CREATE_APPOINTMENT_REQUEST} from "@/lib/api/appointment-request";
 import {CustomSession} from "@/types/login";
+import {toast} from "react-toastify";
 
 export function useCreateAppointmentRequest() {
 	const { data: session } = useSession() as { data: CustomSession | null };
@@ -27,6 +28,12 @@ export function useCreateAppointmentRequest() {
 				}
 			);
 			return res.data;
+		},
+		onSuccess: () => {
+			toast.success("Tạo yêu cầu thành công", { toastId: "create-appointment-request-success" });
+		},
+		onError: (error) => {
+			toast.error(error?.message, { toastId: "create-appointment-request-error" });
 		},
 	});
 	

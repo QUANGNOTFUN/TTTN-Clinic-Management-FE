@@ -18,4 +18,10 @@ export interface CustomSession extends Session {
 		email?: string | null;
 		role?: string | null;
 	};
+};
+
+export interface ApiErrorResponse {
+	message: string | string[];
+	error: string;
+	statusCode: number;
 }
