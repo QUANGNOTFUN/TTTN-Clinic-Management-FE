@@ -30,7 +30,7 @@ export function ClinicServicesCard(props: ClinicServicesCardType) {
 			{url_image && (
 				<div
 					className={`
-					    relative mb-4
+					    relative mb-4 hidden sm:block
 					    ${isSelected ? "w-full h-auto aspect-[4/3]" : "w-20 h-20"}
 				    `}
 				>
