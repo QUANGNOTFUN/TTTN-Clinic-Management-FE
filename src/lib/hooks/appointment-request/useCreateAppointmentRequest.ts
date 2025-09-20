@@ -1,9 +1,9 @@
 import {CreateAppointmentRequestDto} from "@/types/appointment-request";
 import {useMutation} from "@tanstack/react-query";
-import axios from "axios";
+import axios, {AxiosError} from "axios";
 import {useSession} from "next-auth/react";
 import {CREATE_APPOINTMENT_REQUEST} from "@/lib/api/appointment-request";
-import {CustomSession} from "@/types/login";
+import {ApiErrorResponse, CustomSession} from "@/types/login";
 import {toast} from "react-toastify";
 
 export function useCreateAppointmentRequest() {
@@ -32,7 +32,7 @@ export function useCreateAppointmentRequest() {
 		onSuccess: () => {
 			toast.success("Tạo yêu cầu thành công", { toastId: "create-appointment-request-success" });
 		},
-		onError: (error: AxiosError<>) => {
+		onError: (error: AxiosError<ApiErrorResponse>) => {
 			toast.error(error?.message, { toastId: "create-appointment-request-error" });
 		},
 	});
