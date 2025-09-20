@@ -2,7 +2,7 @@ import {Sheet, SheetContent, SheetTrigger} from "@/components/ui/sheet";
 import {Button} from "@/components/ui/button";
 import {
 	BellIcon,
-	BookHeartIcon,
+	BookHeartIcon, BookMarked,
 	CalendarPlusIcon,
 	LibraryBigIcon,
 	LogInIcon,
@@ -31,7 +31,8 @@ export default function MobileHeader() {
 	];
 	const bNavLinks = [
 		{ href: "/profile", label: "Trang cá nhân", icon: <SquareUserRoundIcon className="w-5 h-5" /> },
-		{ href: "/appointment", label: "Lịch hẹn", icon: <BookHeartIcon className="w-5 h-5" />, isDotIndicator: appointmentRequest?.length > 0 },
+		{ href: "/appointment-request", label: "Lịch hẹn", icon: <BookHeartIcon className="w-5 h-5" />, isDotIndicator: appointmentRequest?.length > 0 },
+		{ href: "/appointment", label: "Lịch hẹn", icon: <BookMarked className="w-5 h-5" /> },
 		{ href: "/notifications", label: "Thông báo", icon: <BellIcon className="w-5 h-5" /> },
 	];
 	

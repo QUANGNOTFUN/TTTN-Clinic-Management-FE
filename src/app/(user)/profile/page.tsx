@@ -2,7 +2,6 @@
 
 import {useFindOnePatient} from "@/lib/hooks/patients/useFindOnePatient";
 import {VscLoading} from "react-icons/vsc";
-import Image from "next/image";
 import {useSession} from "next-auth/react";
 import {CustomSession} from "@/types/login";
 import {Button} from "@/components/ui/button";
@@ -13,6 +12,7 @@ import {useUpdatePatient} from "@/lib/hooks/patients/useUpdatePatient";
 import {useUpdatePatientImage} from "@/lib/hooks/image/useUpdatePatientImage";
 import {GenericUpdateImageForm} from "@/app/(admin)/_components/mocules/GenericUpdateImageForm";
 import {GET_IMAGE_API} from "@/lib/api/image";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 
 export default function ProfilePage() {
     const { data: session } = useSession() as { data: CustomSession };
@@ -111,17 +111,20 @@ export default function ProfilePage() {
                 {/* Header */}
                 <div className="relative flex flex-col md:flex-row items-center gap-6 bg-white p-6 rounded-2xl shadow">
                     <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-md">
-                        <Image
-                            src={
-                                data?.avatar_url
-                                    ? GET_IMAGE_API(data?.avatar_url)
-                                    : "/default-avatar.png"
-                            }
-                            alt="Avatar"
-                            fill
-                            className="object-cover"
-                        />
-                        
+                        <Avatar className="w-10 h-10 lg:w-14 lg:h-14 border shadow-sm">
+                            <AvatarImage
+                                src={
+                                    data?.avatar_url
+                                        ? GET_IMAGE_API(data?.avatar_url)
+                                        : "/default-avatar.png"
+                                }
+                                className="w-full h-full object-cover rounded-full"
+                                alt="Avatar"
+                            />
+                            <AvatarFallback>
+                                {data?.full_name?.charAt(0) ?? "?"}
+                            </AvatarFallback>
+                        </Avatar>
                     </div>
                     {/* Name and email */}
                     <div className="text-center md:text-left space-y-2">

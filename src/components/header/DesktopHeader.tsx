@@ -26,7 +26,7 @@ export default function DesktopHeader() {
 	]
 	
 	const rNavLinks = [
-		{ href: '/appointment', label: 'Lịch hẹn', icon: <BookHeartIcon className="w-4 h-4 text-white" />, isDotIndicator: appointmentRequest.length > 0 },
+		{ href: '/appointment-request', label: 'Lịch hẹn', icon: <BookHeartIcon className="w-4 h-4 text-white" />, isDotIndicator: appointmentRequest.length > 0 },
 	]
 	
 	return (
